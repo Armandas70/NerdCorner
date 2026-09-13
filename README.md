@@ -1,7 +1,7 @@
 # NerdCorner
 ## 1.1. Sistemos paskirtis
 
-Projekto tikslas – sukurti patogią vietą, kur žmonės galėtų dalintis savo nuomonėmis, teikti klausimus bei diskutuoti apie įvairius žaidimus.
+Projekto tikslas – sukurti patogią vietą, kur žmonės galėtų dalintis savo nuomonėmis, teikti klausimus bei diskutuoti apie įvairius žaidimus.  
 Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. Svetainėje naudotojai galės pasirinkti apie kokį žaidimą nori diskutuoti ir ten kurti įrašus, o įrašuose palikti komentarus arba peržiūrėti kitų naudotojų. Sistema turės 3 naudotojų tipus: svečias, prisiregistravęs naudotojas ir administratorius. Kiekviena rolė turės tam tikrus apribojimus kaip jos leidžia rolės atstovams naudotis sistema.
 
 
