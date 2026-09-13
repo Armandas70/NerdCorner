@@ -30,12 +30,9 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
 
 ## 1.3. Technologijų aprašymas
 
-### Sistemą sudaro:
-
-•	Kliento pusė (angl. frontend) – naudoja React.js karkasą
-
-•	Serverio pusė (angl. backend) – naudoja Express.js karkasą
-
+### Sistemą sudaro:  
+•	Kliento pusė (angl. frontend) – naudoja React.js karkasą  
+•	Serverio pusė (angl. backend) – naudoja Express.js karkasą  
 •	Duomenų bazė – naudoja MySQL
 
 
