@@ -28,16 +28,14 @@ Administratoriaus galimybės:
 6.	Ištrinti žaidimą
 
 
-2. TECHNOLOGIJŲ APRAŠYMAS
+1.3. Technologijų aprašymas
+
 Sistemą sudaro:
+
 •	Kliento pusė (angl. frontend) – naudoja React.js karkasą
+
 •	Serverio pusė (angl. backend) – naudoja Express.js karkasą
+
 •	Duomenų bazė – naudoja MySQL
-
-Sistemos architektūra:
- 
-1 pav. Sistemos diegimo diagrama
-
-Šiame paveikslėlyje yra parodytos visos sistemos dalys, naudojamos technologijos joms sukurti bei ryšiai vaizduojantys kaip jos yra sujungtos tarpusavyje. Kliento prisijungimui prie svetainės yra naudojamas HTTPS protokolas, sąveikavimui tarp kliento ir serverio pusių taip pat yra naudojamas HTTPS protokolas, o duomenų perdavimui su duomenų baze naudojamas TCP/IP protokolas. Taip pat galima pastebėti, jog sistema slypi „Azure“ serveryje naudojant kompiuterinių debesijų technologijas.
 
 
