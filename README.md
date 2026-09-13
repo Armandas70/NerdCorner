@@ -17,18 +17,30 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
 ### Prisiregistravusio naudotojo galimybės:
 1.	Prisijungti prie sistemos
 2.	Atsijungti nuo sistemos
-3.	Peržiūrėti: •	Žaidimų katalogą •	Įrašus •	Komentarus
-4.	Sukurti: •	Įrašą •	Komentarą
-5.	Redaguoti savo: •	Įrašą •	Komentarą
-6.	Ištrinti savo:•	Įrašą •	Komentarą
+3.	Peržiūrėti:
+    - Žaidimų katalogą
+    - Įrašus
+    - Komentarus
+5.	Sukurti:
+    - Įrašą
+    - Komentarą
+7.	Redaguoti savo:
+    - Įrašą
+    - Komentarą
+9.	Ištrinti savo:
+    - Įrašą
+    - Komentarą
 
 ### Administratoriaus galimybės:
 1.	Prisijungti prie sistemos
 2.	Atsijungti nuo sistemos
-3.	Peržiūrėti: •	Žaidimų katalogą •	Įrašus •	Komentarus
-4.	Sukurti žaidimą
-5.	Redaguoti žaidimą
-6.	Ištrinti žaidimą
+3.	Peržiūrėti:
+    - Žaidimų katalogą
+    - Įrašus
+    - Komentarus
+5.	Sukurti žaidimą
+6.	Redaguoti žaidimą
+7.	Ištrinti žaidimą
 
 
 ## 1.3. Technologijų aprašymas
