@@ -7,7 +7,8 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
 1.2. Funkciniai reikalavimai
 
 Svečio (neprisiregistravusio naudotojo) galimybės:
-1.	Peržiūrėti: •	Žaidimų katalogą •	Įrašus •	Komentarus
+1.	Peržiūrėti:
+				•	Žaidimų katalogą •	Įrašus •	Komentarus
 4.	Užsiregistruoti prie sistemos
 
 Prisiregistravusio naudotojo galimybės:
