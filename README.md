@@ -13,19 +13,10 @@ Svečio (neprisiregistravusio naudotojo) galimybės:
 Prisiregistravusio naudotojo galimybės:
 1.	Prisijungti prie sistemos
 2.	Atsijungti nuo sistemos
-3.	Peržiūrėti
-•	Žaidimų katalogą
-•	Įrašus
-•	Komentarus
-4.	Sukurti
-•	Įrašą
-•	Komentarą
-5.	Redaguoti savo
-•	Įrašą
-•	Komentarą
-6.	Ištrinti savo
-•	Įrašą
-•	Komentarą
+3.	Peržiūrėti: •	Žaidimų katalogą •	Įrašus •	Komentarus
+4.	Sukurti: •	Įrašą •	Komentarą
+5.	Redaguoti savo: •	Įrašą •	Komentarą
+6.	Ištrinti savo:•	Įrašą •	Komentarą
 
 Administratoriaus galimybės:
 1.	Prisijungti prie sistemos
