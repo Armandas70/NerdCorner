@@ -9,11 +9,12 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
 Svečio (neprisiregistravusio naudotojo) galimybės:
 1.	Peržiūrėti
 
-•	Žaidimų katalogą
+  •	Žaidimų katalogą
 
-•	Įrašus
+  •	Įrašus
 
-•	Komentarus
+  •	Komentarus
+
 4.	Užsiregistruoti prie sistemos
 
 Prisiregistravusio naudotojo galimybės:
