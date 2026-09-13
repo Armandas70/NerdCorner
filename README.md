@@ -8,10 +8,13 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
 
 Svečio (neprisiregistravusio naudotojo) galimybės:
 1.	Peržiūrėti
+
 •	Žaidimų katalogą
+
 •	Įrašus
+
 •	Komentarus
-2.	Užsiregistruoti prie sistemos
+4.	Užsiregistruoti prie sistemos
 
 Prisiregistravusio naudotojo galimybės:
 1.	Prisijungti prie sistemos
