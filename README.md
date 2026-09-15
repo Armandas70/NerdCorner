@@ -48,6 +48,6 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
 ### Sistemą sudaro:  
 •	Kliento pusė (angl. frontend) – naudoja React.js karkasą  
 •	Serverio pusė (angl. backend) – naudoja Express.js karkasą  
-•	Duomenų bazė – naudoja MySQL
+•	Duomenų bazė – naudoja PostgreSQL
 
 
