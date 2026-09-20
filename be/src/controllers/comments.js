@@ -1,55 +1,15 @@
-import { db } from "../../index.js";
+import { db, listAll, getOne, deleteOne } from "../database.js";
 
 export const getComments = async (req, res) => {
-    const query = "select * from comments"
-    try {
-        db.manyOrNone(query)
-            .then((data) => {
-                console.log('GET Comments results:', data);
-                res.status(200).json(data);
-            })
-            .catch((error) => {
-                console.log('GET Comments error:', error);
-                res.status(500).json({ message: "Server error" });
-            });
-
-    } catch (error) {
-        console.error("GET Comments error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
+    listAll(req, res, "comments");
 };
 
 export const getComment = async (req, res) => {
-    const id = req.params.id;
-    const query = (`select * from comments where id = ${id}`);
+    getOne(req, res, "comments", "Comment");
+};
 
-    // Checks if id is a valid number
-    if (isNaN(id)) {
-        console.log("GET Comment error:", `Invalid id`);
-        res.status(400).json({ message: "Invalid id" });
-        return;
-    }
-
-    try {
-        db.oneOrNone(query)
-            .then((data) => {
-                if (data == null) {
-                    console.log("GET Comment error:", `Comment with id ${id} not found`);
-                    res.status(404).json({ message: "Comment not found" });
-                } else {
-                    console.log('GET Comment results:', data);
-                    res.status(200).json(data);
-                }
-            })
-            .catch((error) => {
-                console.log('GET Comment error:', error);
-                res.status(500).json({ message: "Server error" });
-            });
-
-    } catch (error) {
-        console.error("GET Comment error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
+export const deleteComment = async (req, res) => {
+    deleteOne(req, res, "comments", "Comment");
 };
 
 export const createComment = async (req, res) => {
@@ -172,45 +132,3 @@ export const updateComment = async (req, res) => {
     }
 };
 
-export const deleteComment = async (req, res) => {
-    const id = req.params.id;
-    const getQuery = (`select * from comments where id = ${id}`);
-    const deleteQuery = (`delete from comments where id = ${id}`);
-
-    // Checks if id is a valid number
-    if (isNaN(id)) {
-        console.log("DELETE Comment error:", `Invalid id`);
-        res.status(400).json({ message: "Invalid id" });
-        return;
-    }
-
-    try {
-        // Checks if comment with id exists
-        db.oneOrNone(getQuery)
-            .then((data) => {
-                if (data == null) {
-                    console.log("DELETE Comment error:", `Comment with id ${id} not found`);
-                    res.status(404).json({ message: "Comment not found" });
-                } else {
-                    // Tries to comment the post with id (if comment exists)
-                    db.query(deleteQuery)
-                        .then((data) => {
-                            console.log('DELETE Comment results:', data);
-                            res.status(200).json(data);
-                        })
-                        .catch((error) => {
-                            console.log('DELETE Comment error:', error);
-                            res.status(500).json({ message: "Server error" });
-                        });
-                }
-            })
-            .catch((error) => {
-                console.log('DELETE Comment error:', error);
-                res.status(500).json({ message: "Server error" });
-            });
-
-    } catch (error) {
-        console.error("DELETE Comment error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-};

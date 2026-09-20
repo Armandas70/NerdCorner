@@ -1,4 +1,4 @@
-import { db } from "../../index.js";
+import { db, listAll, getOne, deleteOne } from "../database.js";
 
 // === FOR LATER ===
 
@@ -46,55 +46,15 @@ import { db } from "../../index.js";
 // };
 
 export const getPosts = async (req, res) => {
-    const query = "select * from posts"
-    try {
-        db.manyOrNone(query)
-            .then((data) => {
-                console.log('GET Posts results:', data);
-                res.status(200).json(data);
-            })
-            .catch((error) => {
-                console.log('GET Posts error:', error);
-                res.status(500).json({ message: "Server error" });
-            });
-
-    } catch (error) {
-        console.error("GET Posts error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
+    listAll(req, res, "posts");
 };
 
 export const getPost = async (req, res) => {
-    const id = req.params.id;
-    const query = (`select * from posts where id = ${id}`);
+    getOne(req, res, "posts", "Post");
+};
 
-    // Checks if id is a valid number
-    if (isNaN(id)) {
-        console.log("GET Post error:", `Invalid id`);
-        res.status(400).json({ message: "Invalid id" });
-        return;
-    }
-
-    try {
-        db.oneOrNone(query)
-            .then((data) => {
-                if (data == null) {
-                    console.log("GET Post error:", `Post with id ${id} not found`);
-                    res.status(404).json({ message: "Post not found" });
-                } else {
-                    console.log('GET Post results:', data);
-                    res.status(200).json(data);
-                }
-            })
-            .catch((error) => {
-                console.log('GET Post error:', error);
-                res.status(500).json({ message: "Server error" });
-            });
-
-    } catch (error) {
-        console.error("GET Post error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
+export const deletePost = async (req, res) => {
+    deleteOne(req, res, "posts", "Post");
 };
 
 export const createPost = async (req, res) => {
@@ -215,49 +175,6 @@ export const updatePost = async (req, res) => {
 
     } catch (error) {
         console.error("UPDATE Post error:", error);
-        res.status(500).json({ message: "Server error" });
-    }
-};
-
-export const deletePost = async (req, res) => {
-    const id = req.params.id;
-    const getQuery = (`select * from posts where id = ${id}`);
-    const deleteQuery = (`delete from posts where id = ${id}`);
-
-    // Checks if id is a valid number
-    if (isNaN(id)) {
-        console.log("DELETE Post error:", `Invalid id`);
-        res.status(400).json({ message: "Invalid id" });
-        return;
-    }
-
-    try {
-        // Checks if post with id exists
-        db.oneOrNone(getQuery)
-            .then((data) => {
-                if (data == null) {
-                    console.log("DELETE Post error:", `Post with id ${id} not found`);
-                    res.status(404).json({ message: "Post not found" });
-                } else {
-                    // Tries to delete the post with id (if post exists)
-                    db.query(deleteQuery)
-                        .then((data) => {
-                            console.log('DELETE Post results:', data);
-                            res.status(200).json(data);
-                        })
-                        .catch((error) => {
-                            console.log('DELETE Post error:', error);
-                            res.status(500).json({ message: "Server error" });
-                        });
-                }
-            })
-            .catch((error) => {
-                console.log('DELETE Post error:', error);
-                res.status(500).json({ message: "Server error" });
-            });
-
-    } catch (error) {
-        console.error("DELETE Post error:", error);
         res.status(500).json({ message: "Server error" });
     }
 };
