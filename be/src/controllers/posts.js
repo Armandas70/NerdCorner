@@ -90,13 +90,13 @@ export const createPost = async (req, res) => {
             .then((data) => {
                 if (data == null) {
                     console.log("CREATE Post error:", `Game with id ${gameId} not found`);
-                    res.status(400).json({ message: "Game not found" });
+                    res.status(404).json({ message: "Game not found" });
                 } else {
                     // Tries to create the post
                     db.query(createQuery)
                         .then((data) => {
                             console.log('CREATE Post results:', data);
-                            res.status(200).json(data);
+                            res.status(201).json(data);
                         })
                         .catch((error) => {
                             console.log('CREATE Post error:', error);
@@ -154,7 +154,7 @@ export const updatePost = async (req, res) => {
             .then((data) => {
                 if (data == null) {
                     console.log("UPDATE Post error:", `Post with id ${id} not found`);
-                    res.status(400).json({ message: "Post not found" });
+                    res.status(404).json({ message: "Post not found" });
                 } else {
                     // Tries to update the post (if it exists)
                     db.query(updateQuery)

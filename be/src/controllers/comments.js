@@ -44,13 +44,13 @@ export const createComment = async (req, res) => {
             .then((data) => {
                 if (data == null) {
                     console.log("CREATE Comment error:", `Post with id ${postId} not found`);
-                    res.status(400).json({ message: "Post not found" });
+                    res.status(404).json({ message: "Post not found" });
                 } else {
                     // Tries to create the comment
                     db.query(createQuery)
                         .then((data) => {
                             console.log('CREATE Comment results:', data);
-                            res.status(200).json(data);
+                            res.status(201).json(data);
                         })
                         .catch((error) => {
                             console.log('CREATE Comment error:', error);
@@ -107,7 +107,7 @@ export const updateComment = async (req, res) => {
             .then((data) => {
                 if (data == null) {
                     console.log("UPDATE Comment error:", `Comment with id ${id} not found`);
-                    res.status(400).json({ message: "Comment not found" });
+                    res.status(404).json({ message: "Comment not found" });
                 } else {
                     // Tries to update the comment (if it exists)
                     db.query(updateQuery)

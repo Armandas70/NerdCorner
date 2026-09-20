@@ -49,7 +49,7 @@ export const createGame = async (req, res) => {
                     db.query(createQuery)
                         .then((data) => {
                             console.log('CREATE Game results:', data);
-                            res.status(200).json(data);
+                            res.status(201).json(data);
                         })
                         .catch((error) => {
                             console.log('CREATE Game error:', error);
@@ -132,3 +132,66 @@ export const updateGame = async (req, res) => {
     }
 };
 
+export const getGamePostComments = async (req, res) => {
+    const gameId = req.params.gameId;
+    const postId = req.params.postId;
+
+    // Constructs queries
+    const getGameQuery = `select * from games where id = ${gameId}`;
+    const getPostQuery = `select * from posts where id = ${postId} AND game_id = ${gameId}`;
+    const getCommentsQuery = `select * from comments where post_id = ${postId}`
+
+    // Checks if game id and post id are valid numbers
+    if (isNaN(gameId)) {
+        console.log("GET error:", `Invalid game id`);
+        res.status(400).json({ message: "Invalid game id" });
+        return;
+    } else if (isNaN(postId)) {
+        console.log("GET error:", `Invalid post id`);
+        res.status(400).json({ message: "Invalid post id" });
+        return;
+    }
+
+    try {
+        // Checks if game with id exists
+        db.oneOrNone(getGameQuery)
+            .then((data) => {
+                if (data == null) {
+                    console.log("GET error:", `Game with id ${gameId} not found`);
+                    res.status(404).json({ message: "Game not found" });
+                } else {
+                    // Checks if post with id (and game_id) exists
+                    db.oneOrNone(getPostQuery)
+                        .then((data) => {
+                            if (data == null) {
+                                console.log("GET error:", `Post with id ${postId} and game_id ${gameId} not found`);
+                                res.status(404).json({ message: "Post not found" });
+                            } else {
+                                // Gets the comments
+                                db.manyOrNone(getCommentsQuery)
+                                    .then((data) => {
+                                        console.log(`GET results:`, data);
+                                        res.status(200).json(data);
+                                    })
+                                    .catch((error) => {
+                                        console.log(`GET error:`, error);
+                                        res.status(500).json({ message: "Server error" });
+                                    });
+                            }
+                        })
+                        .catch((error) => {
+                            console.log('GET error:', error);
+                            res.status(500).json({ message: "Server error" });
+                        });
+                }
+            })
+            .catch((error) => {
+                console.log(`GET error:`, error);
+                res.status(500).json({ message: "Server error" });
+            });
+
+    } catch (error) {
+        console.error(`GET error:`, error);
+        res.status(500).json({ message: "Server error" });
+    }
+};

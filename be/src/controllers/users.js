@@ -50,7 +50,7 @@ export const createUser = async (req, res) => {
                     db.query(createQuery)
                         .then((data) => {
                             console.log('CREATE User results:', data);
-                            res.status(200).json(data);
+                            res.status(201).json(data);
                         })
                         .catch((error) => {
                             console.log('CREATE User error:', error);
