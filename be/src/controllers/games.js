@@ -162,16 +162,16 @@ export const getGamePostComments = async (req, res) => {
                 } else {
                     // Checks if post with id (and game_id) exists
                     db.oneOrNone(getPostQuery)
-                        .then((data) => {
-                            if (data == null) {
+                        .then((postData) => {
+                            if (postData == null) {
                                 console.log("GET error:", `Post with id ${postId} and game_id ${gameId} not found`);
                                 res.status(404).json({ message: "Post not found" });
                             } else {
                                 // Gets the comments
                                 db.manyOrNone(getCommentsQuery)
-                                    .then((data) => {
-                                        console.log(`GET results:`, data);
-                                        res.status(200).json(data);
+                                    .then((commentsData) => {
+                                        console.log(`GET results:`, commentsData);
+                                        res.status(200).json({post: postData, comments: commentsData});
                                     })
                                     .catch((error) => {
                                         console.log(`GET error:`, error);
