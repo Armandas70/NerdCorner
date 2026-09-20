@@ -148,7 +148,7 @@ export const updateUser = async (req, res) => {
             .then((data) => {
                 if (data == null) {
                     console.log("UPDATE User error:", `User with id ${id} not found`);
-                    res.status(400).json({ message: "User not found" });
+                    res.status(404).json({ message: "User not found" });
                 } else {
                     // Tries to update the user (if it exists)
                     db.query(updateQuery)

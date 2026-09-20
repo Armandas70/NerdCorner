@@ -2,10 +2,13 @@
 import express from "express";
 import pgp from 'pg-promise';
 import dotenv from 'dotenv';
-dotenv.config();
 import {usersRouter} from "./src/routes/users.js";
+import {gamesRouter} from "./src/routes/games.js";
+import {postsRouter} from "./src/routes/posts.js";
+import {commentsRouter} from "./src/routes/comments.js";
 import bodyParser from 'body-parser';
 
+dotenv.config();
 const app = express();
 const PORT = 3000;
 
@@ -21,6 +24,10 @@ export const db = pgp()(connection);
 app.use(bodyParser.urlencoded({ extended: true}));
 
 app.use("/users", usersRouter);
+app.use("/games", gamesRouter);
+app.use("/posts", postsRouter);
+app.use("/comments", commentsRouter);
+
 app.get("/", (req, res) => {
   res.send("Hello, Express!");
 });
