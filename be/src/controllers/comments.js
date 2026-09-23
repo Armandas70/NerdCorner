@@ -1,7 +1,7 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
 
 export const getComments = async (req, res) => {
-    listAll(req, res, "comments");
+    listAll(req, res, "comments", 5, ["created_at"]);
 };
 
 export const getComment = async (req, res) => {

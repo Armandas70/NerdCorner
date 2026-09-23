@@ -46,7 +46,7 @@ import { db, listAll, getOne, deleteOne } from "../database.js";
 // };
 
 export const getPosts = async (req, res) => {
-    listAll(req, res, "posts");
+    listAll(req, res, "posts", 5, ["title", "created_at"]);
 };
 
 export const getPost = async (req, res) => {

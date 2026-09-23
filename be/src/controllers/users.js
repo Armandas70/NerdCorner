@@ -1,7 +1,7 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
 
 export const getUsers = async (req, res) => {
-    listAll(req, res, "users");
+    listAll(req, res, "users", 5);
 };
 
 export const getUser = async (req, res) => {

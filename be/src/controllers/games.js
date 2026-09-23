@@ -1,7 +1,7 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
 
 export const getGames = async (req, res) => {
-    listAll(req, res, "games");
+    listAll(req, res, "games", 10, ["title", "created_at"]);
 };
 
 export const getGame = async (req, res) => {

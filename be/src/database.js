@@ -14,10 +14,37 @@ const connection = {
 export const db = pgp()(connection);
 
 
-// Lists all row of the given table
-export const listAll = async (req, res, table) => {
-    const query = `select * from ${table}`
+// Lists all rows of the given table (using pagination)
+export const listAll = async (req, res, table, limit = 5, filterableValues) => {
+    let page = req.query.page || 1;
+    let filters = "";
+
+    // Constructs filter query (also removes values that table cannot be filtered by)
+    let params = req.query;
+    for (var key in params) {
+        if (filterableValues.includes(key)) {
+            if (filters == "") filters = filters + "WHERE ";
+            else filters = filters + " and "
+
+            if (key == "title") filters = filters + `${key} LIKE '%${params[key]}%'`;
+            else if (key == "created_at") filters = filters + `${key} >= '${params[key]}'`;
+        }
+    }
+
+    // Checks if page is a valid number
+    if (isNaN(page)) {
+        console.log(`GET ${table} error:`, `Invalid page number`);
+        res.status(400).json({ message: "Invalid page number" });
+        return;
+    }
+
+    // Constructs query
+    const query =
+        `select * from ${table} ${filters}
+        OFFSET ${(page - 1) * limit} ROWS FETCH NEXT ${limit} ROWS ONLY`
+
     try {
+        // Makes the request to get the elements
         db.manyOrNone(query)
             .then((data) => {
                 console.log(`GET ${table} results:`, data);
@@ -50,12 +77,12 @@ export const getOne = async (req, res, table, element) => {
     try {
         db.oneOrNone(query)
             .then((data) => {
-                 // Checks if element with id exists
+                // Checks if element with id exists
                 if (data == null) {
                     console.log(`GET ${element} error:`, `${element} with id ${id} not found`);
                     res.status(404).json({ message: `${element} not found` });
                 } else {
-                     // Gets element (if it exists)
+                    // Gets element (if it exists)
                     console.log(`GET ${element} results:`, data);
                     res.status(200).json(data);
                 }
