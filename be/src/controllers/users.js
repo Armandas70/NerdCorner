@@ -54,18 +54,18 @@ export const createUser = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('CREATE User error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('CREATE User error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("CREATE User error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 
@@ -118,18 +118,18 @@ export const updateUser = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('UPDATE User error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('UPDATE User error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("UPDATE User error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 

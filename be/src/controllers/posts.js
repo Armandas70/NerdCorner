@@ -1,50 +1,5 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
 
-// === FOR LATER ===
-
-// export const getPosts = async (req, res) => {
-//     const gameId = req.params.gameId;
-//     const getGameQuery = `select * from games where id = ${gameId}`;
-//     const getPostsQuery = `select * from posts where game_id = ${gameId}`;
-
-//     // Checks if game id is a valid number
-//     if (isNaN(gameId)) {
-//         console.log("GET Posts error:", `Invalid game id = ${gameId}`);
-//         res.status(400).json({ message: "Invalid game id" });
-//         return;
-//     }
-
-//     try {
-//         // Checks if game with game id exists
-//         db.oneOrNone(getGameQuery)
-//             .then((data) => {
-//                 if (data == null) {
-//                     console.log("GET Posts error:", `Game with id ${gameId} not found`);
-//                     res.status(404).json({ message: "Game not found" });
-//                 } else {
-//                     // Tries to get the game's posts (if game exists)
-//                     db.query(getPostsQuery)
-//                         .then((data) => {
-//                             console.log('GET Posts results:', data);
-//                             res.status(200).json(data);
-//                         })
-//                         .catch((error) => {
-//                             console.log('GET Posts error:', error);
-//                             res.status(500).json({ message: "Server error" });
-//                         });
-//                 }
-//             })
-//             .catch((error) => {
-//                 console.log('GET Posts error:', error);
-//                 res.status(500).json({ message: "Server error" });
-//             });
-
-//     } catch (error) {
-//         console.error("GET Posts error:", error);
-//         res.status(500).json({ message: "Server error" });
-//     }
-// };
-
 export const getPosts = async (req, res) => {
     listAll(req, res, "posts", 5, ["title", "created_at"]);
 };
@@ -100,18 +55,18 @@ export const createPost = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('CREATE Post error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('CREATE Post error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("CREATE Post error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 
@@ -164,17 +119,17 @@ export const updatePost = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('UPDATE Post error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('UPDATE Post error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("UPDATE Post error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };

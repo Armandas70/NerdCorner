@@ -52,12 +52,12 @@ export const listAll = async (req, res, table, limit = 5, filterableValues) => {
             })
             .catch((error) => {
                 console.log(`GET ${table} error:`, error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error(`GET ${table} error:`, error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 
@@ -89,12 +89,12 @@ export const getOne = async (req, res, table, element) => {
             })
             .catch((error) => {
                 console.log(`GET ${element} error:`, error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error(`GET ${element} error:`, error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 
@@ -128,17 +128,17 @@ export const deleteOne = async (req, res, table, element) => {
                         })
                         .catch((error) => {
                             console.log(`${element} User error:`, error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log(`${element} User error:`, error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error(`${element} User error:`, error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };

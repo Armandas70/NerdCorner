@@ -54,18 +54,18 @@ export const createComment = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('CREATE Comment error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('CREATE Comment error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("CREATE Comment error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 
@@ -117,18 +117,18 @@ export const updateComment = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('UPDATE Comment error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('UPDATE Comment error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("UPDATE Comment error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 

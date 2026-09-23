@@ -53,18 +53,18 @@ export const createGame = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('CREATE Game error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('CREATE Game error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("CREATE Game error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 
@@ -117,18 +117,18 @@ export const updateGame = async (req, res) => {
                         })
                         .catch((error) => {
                             console.log('UPDATE Game error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log('UPDATE Game error:', error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error("UPDATE Game error:", error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
 
@@ -175,23 +175,23 @@ export const getGamePostComments = async (req, res) => {
                                     })
                                     .catch((error) => {
                                         console.log(`GET error:`, error);
-                                        res.status(500).json({ message: "Server error" });
+                                        res.status(400).json({ message: "Bad request" });
                                     });
                             }
                         })
                         .catch((error) => {
                             console.log('GET error:', error);
-                            res.status(500).json({ message: "Server error" });
+                            res.status(400).json({ message: "Bad request" });
                         });
                 }
             })
             .catch((error) => {
                 console.log(`GET error:`, error);
-                res.status(500).json({ message: "Server error" });
+                res.status(400).json({ message: "Bad request" });
             });
 
     } catch (error) {
         console.error(`GET error:`, error);
-        res.status(500).json({ message: "Server error" });
+        res.status(400).json({ message: "Bad request" });
     }
 };
