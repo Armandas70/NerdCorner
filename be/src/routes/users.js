@@ -9,5 +9,5 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 usersRouter.get("/", getUsers);
 usersRouter.get("/:id", getUser);
 usersRouter.post("/", jsonParser, createUser);
-usersRouter.post("/:id", jsonParser, updateUser);
+usersRouter.patch("/:id", jsonParser, updateUser);
 usersRouter.delete("/:id", deleteUser);

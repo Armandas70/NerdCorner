@@ -9,6 +9,6 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 gamesRouter.get("/", getGames);
 gamesRouter.get("/:id", getGame);
 gamesRouter.post("/", jsonParser, createGame);
-gamesRouter.post("/:id", jsonParser, updateGame);
+gamesRouter.patch("/:id", jsonParser, updateGame);
 gamesRouter.delete("/:id", deleteGame);
 gamesRouter.get("/:gameId/posts/:postId/comments", getGamePostComments);

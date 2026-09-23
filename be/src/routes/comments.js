@@ -9,5 +9,5 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 commentsRouter.get("/", getComments);
 commentsRouter.get("/:id", getComment);
 commentsRouter.post("/", jsonParser, createComment);
-commentsRouter.post("/:id", jsonParser, updateComment);
+commentsRouter.patch("/:id", jsonParser, updateComment);
 commentsRouter.delete("/:id", deleteComment);
