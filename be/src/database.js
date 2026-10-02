@@ -48,7 +48,9 @@ export const listAll = async (req, res, table, limit = 5, filterableValues) => {
         db.manyOrNone(query)
             .then((data) => {
                 console.log(`GET ${table} results:`, data);
-                res.status(200).json(data);
+                const pages = getPages(table, page, params)
+                let links = JSON.parse(`{"previous": ${pages[0]}, "next": ${pages[1]}}`)
+                res.status(200).json({ data: data, links: links });
             })
             .catch((error) => {
                 console.log(`GET ${table} error:`, error);
@@ -84,7 +86,9 @@ export const getOne = async (req, res, table, element) => {
                 } else {
                     // Gets element (if it exists)
                     console.log(`GET ${element} results:`, data);
-                    res.status(200).json(data);
+                    let url = `"http://localhost:3000/${table}/${id}"`
+                    let links = JSON.parse(`{"update": ${url}, "delete": ${url}}`)
+                    res.status(200).json({ data: data, links: links });
                 }
             })
             .catch((error) => {
@@ -142,3 +146,26 @@ export const deleteOne = async (req, res, table, element) => {
         res.status(400).json({ message: "Bad request" });
     }
 };
+
+
+// Helper methods
+
+const getPages = (table, currentPage, params) => {
+    let prevPage = parseInt(currentPage) - 1
+    let nextPage = parseInt(currentPage) + 1
+
+    let url = `"http://localhost:3000/${table}`
+    let previous = `${url}?page=${prevPage}`
+    let next = `${url}?page=${nextPage}`
+
+    for (var key in params) {
+        if (key == "page") continue
+        previous = `${previous}&${key}=${params[key]}`
+        next = `${next}&${key}=${params[key]}`
+    }
+
+    previous = currentPage != 1 ? `${previous}"` : `""`
+    next = `${next}"`
+
+    return [previous, next]
+}
