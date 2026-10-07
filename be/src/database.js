@@ -15,7 +15,7 @@ export const db = pgp()(connection);
 
 
 // Lists all rows of the given table (using pagination)
-export const listAll = async (req, res, table, limit = 5, filterableValues) => {
+export const listAll = async (req, res, table, limit = 3, filterableValues) => {
     let page = req.query.page || 1;
     let filters = "";
 
@@ -168,4 +168,33 @@ const getPages = (table, currentPage, params) => {
     next = `${next}"`
 
     return [previous, next]
+}
+
+export const getUserByEmail = async (email) => {
+    const query = (`select * from users where email = '${email}'`);
+
+    return new Promise((resolve, reject) => {
+        try {
+            db.oneOrNone(query)
+                .then((data) => {
+                    // Checks if element with id exists
+                    if (data == null) {
+                        console.log(`GET User error:`, `User with email ${email} not found`);
+                        resolve(data);
+                    } else {
+                        // Gets element (if it exists)
+                        console.log(`GET User results:`, data);
+                        resolve(data);
+                    }
+                })
+                .catch((error) => {
+                    console.log(`GET User error:`, error);
+                    reject(error)
+                });
+
+        } catch (error) {
+            console.error(`GET User error:`, error);
+            reject(error)
+        }
+    });
 }
