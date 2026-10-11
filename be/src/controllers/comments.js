@@ -1,4 +1,5 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
+import { validateJWT } from "../middleware/authorization.js"
 
 export const getComments = async (req, res) => {
     listAll(req, res, "comments", 3, ["created_at"]);
@@ -15,6 +16,12 @@ export const deleteComment = async (req, res) => {
 export const createComment = async (req, res) => {
     const body = req.body;
 
+    // Checks if user is authenticated
+    const user = await validateJWT(req, res);
+    if (user?.message) {
+        return res.status(parseInt(user.status)).json({ message: user.message });
+    }
+
     // Checks if all fields are defined (and not empty)
     if (body == null || body.content == null) {
         console.log("CREATE Comment error:", `None of these fields can be left empty: content`);
@@ -29,7 +36,7 @@ export const createComment = async (req, res) => {
     // Constructs queries
     const content = body.content;
     const postId = body.postId;
-    const creatorId = body.creatorId;
+    const creatorId = user.id;
 
     const getPostQuery = (`select * from posts where id = '${postId}'`);
     const createQuery = (
@@ -73,13 +80,19 @@ export const updateComment = async (req, res) => {
     const id = req.params.id;
     const body = req.body;
 
+    // Checks if user is authenticated
+    const user = await validateJWT(req, res);
+    if (user?.message) {
+        return res.status(parseInt(user.status)).json({ message: user.message });
+    }
+
     // Checks if id is a valid number
     if (isNaN(id)) {
         console.log("UPDATE Comment error:", `Invalid id`);
         res.status(400).json({ message: "Invalid id" });
         return;
     }
- 
+
     // Checks if all fields are defined (and not empty)
     if (body == null || body.content == null) {
         console.log("UPDATE Comment error:", `None of these fields can be left empty: content`);
@@ -109,6 +122,11 @@ export const updateComment = async (req, res) => {
                     console.log("UPDATE Comment error:", `Comment with id ${id} not found`);
                     res.status(404).json({ message: "Comment not found" });
                 } else {
+                    // Checks if user is owner of this post
+                    if (user.id != data.creator_id) {
+                        return res.status(403).json({ message: "Unauthorized: not owner of this resource" });
+                    }
+
                     // Tries to update the comment (if it exists)
                     db.query(updateQuery)
                         .then((data) => {

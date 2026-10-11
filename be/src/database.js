@@ -1,6 +1,6 @@
 import pgp from 'pg-promise';
 import dotenv from 'dotenv';
-
+import {validateJWT} from "./middleware/authorization.js"
 dotenv.config();
 
 // Creates connection to the database
@@ -109,6 +109,16 @@ export const deleteOne = async (req, res, table, element) => {
     const getQuery = (`select * from ${table} where id = ${id}`);
     const deleteQuery = (`delete from ${table} where id = ${id}`);
 
+    // Checks if authorization validation should be applied
+    var user;
+    if (table == "posts" || table == "comments") {
+        // Checks if user is authenticated
+        user = await validateJWT(req, res);
+        if (user?.message) {
+            return res.status(parseInt(user.status)).json({ message: user.message });
+        }
+    }
+
     // Checks if id is a valid number
     if (isNaN(id)) {
         console.log(`DELETE ${element} error:`, `Invalid id`);
@@ -124,6 +134,15 @@ export const deleteOne = async (req, res, table, element) => {
                     console.log(`DELETE ${element} error:`, `${element} with id ${id} not found`);
                     res.status(404).json({ message: `${element} not found` });
                 } else {
+                    // Checks if authorization validation should be applied
+                    if (table == "posts" || table == "comments") {
+                        
+                        // Checks if user is owner of this resource or has Admin privileges
+                        if (user.id != data.creator_id && !user.is_admin) {
+                            return res.status(403).json({ message: "Unauthorized: not owner of this resource" });
+                        }
+                    }
+
                     // Tries to delete the element with id (if it exists)
                     db.query(deleteQuery)
                         .then((data) => {

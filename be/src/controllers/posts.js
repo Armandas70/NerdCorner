@@ -1,4 +1,5 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
+import { validateJWT } from "../middleware/authorization.js"
 
 export const getPosts = async (req, res) => {
     listAll(req, res, "posts", 3, ["title", "created_at"]);
@@ -15,6 +16,12 @@ export const deletePost = async (req, res) => {
 export const createPost = async (req, res) => {
     const body = req.body;
 
+    // Checks if user is authenticated
+    const user = await validateJWT(req, res);
+    if (user?.message) {
+        return res.status(parseInt(user.status)).json({ message: user.message });
+    }
+
     // Checks if all fields are defined (and not empty)
     if (body == null || body.title == null || body.description == null) {
         console.log("CREATE Post error:", `None of these fields can be left empty: title, description`);
@@ -30,7 +37,7 @@ export const createPost = async (req, res) => {
     const title = body.title;
     const description = body.description;
     const gameId = body.gameId;
-    const creatorId = body.creatorId;
+    const creatorId = user.id;
 
     const getGameQuery = (`select * from games where id = '${gameId}'`);
     const createQuery = (
@@ -74,13 +81,19 @@ export const updatePost = async (req, res) => {
     const id = req.params.id;
     const body = req.body;
 
+    // Checks if user is authenticated
+    const user = await validateJWT(req, res);
+    if (user?.message) {
+        return res.status(parseInt(user.status)).json({ message: user.message });
+    }
+
     // Checks if id is a valid number
     if (isNaN(id)) {
         console.log("UPDATE Post error:", `Invalid id`);
         res.status(400).json({ message: "Invalid id" });
         return;
     }
- 
+
     // Checks if all fields are defined (and not empty)
     if (body == null || body.title == null || body.description == null) {
         console.log("UPDATE Post error:", `None of these fields can be left empty: title, description`);
@@ -111,6 +124,11 @@ export const updatePost = async (req, res) => {
                     console.log("UPDATE Post error:", `Post with id ${id} not found`);
                     res.status(404).json({ message: "Post not found" });
                 } else {
+                    // Checks if user is owner of this post
+                    if (user.id != data.creator_id) {
+                        return res.status(403).json({ message: "Unauthorized: not owner of this resource" });
+                    }
+
                     // Tries to update the post (if it exists)
                     db.query(updateQuery)
                         .then((data) => {
