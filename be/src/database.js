@@ -1,6 +1,6 @@
 import pgp from 'pg-promise';
 import dotenv from 'dotenv';
-import {validateJWT} from "./middleware/authorization.js"
+import {validateAccessToken} from "./middleware/authorization.js"
 dotenv.config();
 
 // Creates connection to the database
@@ -113,7 +113,7 @@ export const deleteOne = async (req, res, table, element) => {
     var user;
     if (table == "posts" || table == "comments") {
         // Checks if user is authenticated
-        user = await validateJWT(req, res);
+        user = await validateAccessToken(req, res);
         if (user?.message) {
             return res.status(parseInt(user.status)).json({ message: user.message });
         }

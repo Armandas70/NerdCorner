@@ -1,5 +1,5 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
-import { validateJWT } from "../middleware/authorization.js"
+import { validateAccessToken } from "../middleware/authorization.js"
 
 export const getComments = async (req, res) => {
     listAll(req, res, "comments", 3, ["created_at"]);
@@ -17,7 +17,7 @@ export const createComment = async (req, res) => {
     const body = req.body;
 
     // Checks if user is authenticated
-    const user = await validateJWT(req, res);
+    const user = await validateAccessToken(req, res);
     if (user?.message) {
         return res.status(parseInt(user.status)).json({ message: user.message });
     }
@@ -81,7 +81,7 @@ export const updateComment = async (req, res) => {
     const body = req.body;
 
     // Checks if user is authenticated
-    const user = await validateJWT(req, res);
+    const user = await validateAccessToken(req, res);
     if (user?.message) {
         return res.status(parseInt(user.status)).json({ message: user.message });
     }

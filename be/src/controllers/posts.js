@@ -1,5 +1,5 @@
 import { db, listAll, getOne, deleteOne } from "../database.js";
-import { validateJWT } from "../middleware/authorization.js"
+import { validateAccessToken } from "../middleware/authorization.js"
 
 export const getPosts = async (req, res) => {
     listAll(req, res, "posts", 3, ["title", "created_at"]);
@@ -17,7 +17,7 @@ export const createPost = async (req, res) => {
     const body = req.body;
 
     // Checks if user is authenticated
-    const user = await validateJWT(req, res);
+    const user = await validateAccessToken(req, res);
     if (user?.message) {
         return res.status(parseInt(user.status)).json({ message: user.message });
     }
@@ -82,7 +82,7 @@ export const updatePost = async (req, res) => {
     const body = req.body;
 
     // Checks if user is authenticated
-    const user = await validateJWT(req, res);
+    const user = await validateAccessToken(req, res);
     if (user?.message) {
         return res.status(parseInt(user.status)).json({ message: user.message });
     }

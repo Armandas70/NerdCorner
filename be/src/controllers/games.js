@@ -170,8 +170,9 @@ export const getGamePostComments = async (req, res) => {
                                 // Gets the comments
                                 db.manyOrNone(getCommentsQuery)
                                     .then((commentsData) => {
+                                        let commentsCount = commentsData != null ? commentsData.length : 0;
                                         console.log(`GET results:`, commentsData);
-                                        res.status(200).json({post: postData, comments: commentsData});
+                                        res.status(200).json({post: postData, commentsCount: commentsCount, comments: commentsData});
                                     })
                                     .catch((error) => {
                                         console.log(`GET error:`, error);
