@@ -43,7 +43,6 @@ export const validateRefreshToken = async (req, res) => {
 
         // Gets user's email from access token
         const decoded = jwt.decode(accessToken);
-        //console.log("DECODED: ", decoded);
 
         // Validates refresh token via DB
         const result = await findRefreshToken(refreshToken, decoded.email)
@@ -111,9 +110,10 @@ export const findRefreshToken = async (token, email) => {
 
 export const uploadRefreshToken = async (token, email) => {
     const query = (
-        `UPSERT INTO tokens
-        (email, token)
-        VALUES('${email}', '${token}');`
+        `INSERT INTO tokens (email, refresh_token) 
+        VALUES('${email}', '${token}')
+        ON CONFLICT (email) DO UPDATE
+        SET refresh_token = '${token}';`
     )
 
     return new Promise((resolve, reject) => {

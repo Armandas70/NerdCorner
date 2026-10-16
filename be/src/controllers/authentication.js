@@ -66,7 +66,8 @@ export const register = async (req, res) => {
                                 maxAge: 24 * 60 * 60 * 1000
                             });
 
-                            //await uploadRefreshToken(refreshToken, email);
+                            // Uploads refresh token to DB
+                            uploadRefreshToken(refreshToken, email);
 
                             console.log('Register results:', data);
                             res.status(201).json({ message: "User registered successfully", token: accessToken });
@@ -140,7 +141,8 @@ export const login = async (req, res) => {
                         maxAge: 24 * 60 * 60 * 1000
                     });
 
-                    //await uploadRefreshToken(refreshToken, data.email);
+                    // Uploads refresh token to DB
+                    uploadRefreshToken(refreshToken, data.email);
 
                     console.log('Login results:', data);
                     res.status(200).json({ message: "User logged in successfully", accessToken });
@@ -169,7 +171,6 @@ export const logout = async (req, res) => {
 
         res.clearCookie("access_token");
         res.clearCookie("refresh_token");
-
         res.status(200).json({ message: "User logged out successfully" });
     } catch (error) {
         console.log("Logout error", error);
