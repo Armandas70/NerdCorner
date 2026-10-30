@@ -199,38 +199,4 @@ export const refresh = async (req, res) => {
 
     console.log('Refresh results:', accessToken);
     return res.status(200).json({ token: accessToken });
-
-    // // Checks if cookies are defined and have refresh_token key
-    // if (req.cookies?.refresh_token) {
-
-    //     // Destructues refreshToken from cookie
-    //     const refreshToken = req.cookies.refresh_token;
-
-    //     // Verifies refresh token
-    //     jwt.verify(refreshToken, JWT_REFRESH_SECRET,
-    //         (err, decoded) => {
-    //             if (err) {
-    //                 // Wrong Refesh Token
-    //                 console.log('Refresh error (Wrong token):', err);
-    //                 return res.status(406).json({ message: 'Unauthorized' });
-    //             }
-    //             else {
-    //                 // Correct token - creates new access token
-    //                 const accessToken = jwt.sign({ email: decoded.email }, JWT_ACCESS_SECRET, {
-    //                     expiresIn: "5m",
-    //                 });
-    //                 res.cookie('access_token', accessToken, {
-    //                     httpOnly: true,
-    //                     sameSite: 'Lax', secure: true,
-    //                     maxAge: 24 * 60 * 60 * 1000
-    //                 });
-
-    //                 console.log('Refresh results:', accessToken);
-    //                 return res.status(200).json({ token: accessToken });
-    //             }
-    //         })
-    // } else {
-    //     console.log('Refresh error:', req.cookies);
-    //     return res.status(406).json({ message: 'Unauthorized' });
-    // }
 }
