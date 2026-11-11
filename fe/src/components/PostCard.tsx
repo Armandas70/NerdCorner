@@ -11,7 +11,8 @@ interface PostCardProps {
 function PostCard({ creator, title, description, createdAt, isEdited }: PostCardProps) {
     return (
         <div>
-            <Card className="w-5xl hover:cursor-pointer hover:bg-secondary" variant="default">
+            <Card className="min-w-5xl hover:cursor-pointer hover:bg-secondary border-1 border-solid border-secondary"
+                variant="default">
                 <Card.Header>
                     <Card.Description className="text-xl text-primary mb-1 font-bold">• {creator}</Card.Description>
                     <Card.Title className="text-3xl mb-2">{title}</Card.Title>

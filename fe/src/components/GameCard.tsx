@@ -6,10 +6,11 @@ interface GameCardProps {
   createdAt: string;
 }
 
-function GameCard({title, description, createdAt}: GameCardProps) {
+function GameCard({ title, description, createdAt }: GameCardProps) {
   return (
     <div>
-      <Card className="w-5xl hover:cursor-pointer hover:bg-secondary" variant="default">
+      <Card className="w-5xl hover:cursor-pointer hover:bg-secondary border-1 border-solid border-secondary"
+        variant="default">
         <Card.Header>
           <Card.Title className="text-3xl mb-2">{title}</Card.Title>
           <Card.Description className="text-xl text-primary">{createdAt}</Card.Description>

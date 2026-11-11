@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import GameCard from '../components/GameCard';
 import Header from '../components/Header';
+import SideBar from '../components/SideBar';
 
 function HomePage() {
 
@@ -18,13 +19,21 @@ function HomePage() {
       <div className='mb-5'>
         <Header></Header>
       </div>
-      <div className="grid justify-center grid-cols-1">
-        {games.map((game) => (
-          <div className='flex mb-3 justify-center'>
-            <GameCard key={game.id} title={game.title} description={game.description} createdAt={game.createdAt}></GameCard>
-          </div>
-        ))}
+
+      <div className="flex flex-row gap-40">
+        <aside className="block min-w-xs min-h-5xl float-left sticky">
+          <SideBar></SideBar>
+        </aside>
+
+        <div className="grid grid-cols-1 justify-center">
+          {games.map((game) => (
+            <div className='flex mb-3 justify-center'>
+              <GameCard key={game.id} title={game.title} description={game.description} createdAt={game.createdAt}></GameCard>
+            </div>
+          ))}
+        </div>
       </div>
+
     </div>
   )
 }

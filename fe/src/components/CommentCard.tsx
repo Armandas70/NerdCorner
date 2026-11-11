@@ -7,10 +7,12 @@ interface CommentCardProps {
     isEdited: boolean;
 }
 
+// Ideal CommentCard has classname="w-3xl"
+
 function CommentCard({ creator, content, createdAt, isEdited }: CommentCardProps) {
     return (
         <div>
-            <Card className="w-4xl" variant="default">
+            <Card className="w-5xl" variant="default"> 
                 <Card.Header>
                     <Card.Title className="text-xl text-primary mb-1 font-bold">• {creator}</Card.Title>
                     <Card.Description className="flex-cols-2 text-xl text-primary">

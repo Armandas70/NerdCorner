@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Header from '../components/Header';
 import GameHeader from '../components/GameHeader';
 import PostCard from '../components/PostCard';
-
+import SideBar from '../components/SideBar';
 
 function GamePage() {
 
@@ -27,15 +27,24 @@ function GamePage() {
                 <Header></Header>
                 <GameHeader title={title} description={description} createdAt={createdAt}></GameHeader>
             </div>
-            <div className="grid justify-center grid-cols-1">
-                {posts.map((post) => (
-                    <div className='flex mb-3 justify-center'>
-                        <PostCard key={post.id} creator={post.creator} title={post.title}
-                            description={post.description} createdAt={post.createdAt} isEdited={post.isEdited}>
-                        </PostCard>
-                    </div>
-                ))}
+
+            <div className="flex flex-row gap-40">
+                <aside className="block min-w-xs min-h-5xl float-left sticky">
+                    <SideBar></SideBar>
+                </aside>
+
+                <div className="grid justify-center grid-cols-1">
+                    {posts.map((post) => (
+                        <div className='flex mb-3 justify-center'>
+                            <PostCard key={post.id} creator={post.creator} title={post.title}
+                                description={post.description} createdAt={post.createdAt} isEdited={post.isEdited}>
+                            </PostCard>
+                        </div>
+                    ))}
+                </div>
             </div>
+
+
         </div>
     )
 }

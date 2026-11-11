@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import GameHeader from '../components/GameHeader';
 import CommentCard from '../components/CommentCard';
 import PostDetailsCard from '../components/PostDetailsCard';
+import SideBar from '../components/SideBar';
 
 function PostPage() {
     const [title, setTitle] = useState("Persona 5");
@@ -33,21 +34,30 @@ function PostPage() {
                 <GameHeader title={title} description={description} createdAt={createdAt}></GameHeader>
             </div>
 
-            <div className='flex justify-center mb-5'>
-                <PostDetailsCard creator={pCreator} title={pTitle} description={pDescription}
-                    createdAt={pCreatedAt} isEdited={pIsEdited}>
-                </PostDetailsCard>
+            <div className="flex flex-row gap-40">
+                <aside className="block min-w-xs min-h-5xl float-left sticky">
+                    <SideBar ></SideBar>
+                </aside>
+
+                <div>
+                    <div className='flex justify-center mb-5'>
+                        <PostDetailsCard creator={pCreator} title={pTitle} description={pDescription}
+                            createdAt={pCreatedAt} isEdited={pIsEdited}>
+                        </PostDetailsCard>
+                    </div>
+
+                    <div className="grid justify-center grid-cols-1">
+                        {comments.map((comment) => (
+                            <div className='flex mb-3 justify-center'>
+                                <CommentCard key={comment.id} creator={comment.creator} content={comment.content}
+                                    createdAt={comment.createdAt} isEdited={comment.isEdited}>
+                                </CommentCard>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
 
-            <div className="grid justify-center grid-cols-1">
-                {comments.map((comment) => (
-                    <div className='flex mb-3 justify-center'>
-                        <CommentCard key={comment.id} creator={comment.creator} content={comment.content}
-                            createdAt={comment.createdAt} isEdited={comment.isEdited}>
-                        </CommentCard>
-                    </div>
-                ))}
-            </div>
         </div>
     )
 }

@@ -16,7 +16,7 @@ function PostDetailsCard({
     isEdited,
 }: PostDetailsProps) {
     return (
-        <Card className="max-w-5xl w-full">
+        <Card className="max-w-5xl w-full border-1 border-solid border-secondary">
             <Card.Header>
                 <div className="flex flex-row items-left justify-left w-1/2 gap-x-2">
                     <Card.Title className="text-xl text-primary font-bold">• {creator}</Card.Title>
