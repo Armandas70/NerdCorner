@@ -1,31 +1,75 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { api } from '../App';
 import Header from '../components/Header';
 import GameHeader from '../components/GameHeader';
 import PostCard from '../components/PostCard';
 import SideBar from '../components/SideBar';
 
+interface Game {
+    id: number;
+    title: string;
+    description: string;
+    created_at: Date;
+}
+
+interface Post {
+    id: number;
+    title: string;
+    description: string;
+    created_at: Date;
+    is_edited: boolean;
+    creator_id: number;
+    game_id: number;
+}
+
 function GamePage() {
+    const { gameId } = useParams();
+    const navigate = useNavigate();
+    const [game, setGame] = useState<Game>();
 
-    const [title, setTitle] = useState("Persona 5");
-    const [description, setDescription] = useState("This is a place to talk about the most stylistic game OAT");
-    const [createdAt, setCreatedAt] = useState("2026-09-20");
+    // const [pCreator, setPCreator] = useState("Vegeta64");
+    // const [pTitle, setPTitle] = useState("This game is awesome");
+    // const [pDescription, setPDescription] = useState("I love this game, how about yall?");
+    // const [pCreatedAt, setPCreatedAt] = useState("2026-09-20");
+    // const [pIsEdited, setPIsEdited] = useState(true);
 
-    const [pCreator, setPCreator] = useState("Vegeta64");
-    const [pTitle, setPTitle] = useState("This game is awesome");
-    const [pDescription, setPDescription] = useState("I love this game, how about yall?");
-    const [pCreatedAt, setPCreatedAt] = useState("2026-09-20");
-    const [pIsEdited, setPIsEdited] = useState(true);
+    // const post = {
+    //     id: 0, creator: pCreator, title: pTitle, description: pDescription, createdAt: pCreatedAt, isEdited: pIsEdited
+    // }
+    const [posts, setPosts] = useState<Post[]>([]);
 
-    const post = {
-        id: 0, creator: pCreator, title: pTitle, description: pDescription, createdAt: pCreatedAt, isEdited: pIsEdited
-    }
-    const [posts, setPosts] = useState([post, post, post]);
+    useEffect(() => {
+        fetch(`${api}/games/${gameId}`)
+            .then((res) => {
+                if (res.status != 200) {
+                    return // show not found
+                }
+                return res.json();
+            })
+            .then((json) => {
+                //console.log("data: ", data);
+                if (json) setGame(json.data);
+            })
+
+        fetch(`${api}/games/${gameId}/posts`)
+            .then((res) => res.json())
+            .then((json) => {
+                //console.log("data: ", data);
+                if (json) {
+                    console.log("JSON posts: ", json)
+                    setPosts(json.data);
+                }
+            })
+    }, []);
 
     return (
         <div>
             <div className='mb-5'>
                 <Header></Header>
-                <GameHeader title={title} description={description} createdAt={createdAt}></GameHeader>
+                {game && (
+                    <GameHeader title={game.title} description={game.description} created_at={game.created_at}></GameHeader>
+                )}
             </div>
 
             <div className="flex flex-row gap-40">
@@ -34,10 +78,10 @@ function GamePage() {
                 </aside>
 
                 <div className="grid justify-center grid-cols-1">
-                    {posts.map((post) => (
-                        <div className='flex mb-3 justify-center'>
-                            <PostCard key={post.id} creator={post.creator} title={post.title}
-                                description={post.description} createdAt={post.createdAt} isEdited={post.isEdited}>
+                    {posts.filter(p => gameId ? p.game_id === parseInt(gameId) : p).map((post) => (
+                        <div className='flex mb-3 justify-center' onClick={() => navigate(`/games/${gameId}/posts/${post.id}`)}>
+                            <PostCard key={post.id} title={post.title} description={post.description}
+                                created_at={post.created_at} is_edited={post.is_edited} creator_id={post.creator_id}>
                             </PostCard>
                         </div>
                     ))}

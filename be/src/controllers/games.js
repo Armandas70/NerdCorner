@@ -132,6 +132,50 @@ export const updateGame = async (req, res) => {
     }
 };
 
+export const getGamePosts = async (req, res) => {
+    const gameId = req.params.gameId;
+
+    // Constructs queries
+    const getGameQuery = `select * from games where id = ${gameId}`;
+    const getPostsQuery = `select * from posts where game_id = ${gameId}`;
+
+    // Checks if game id and post id are valid numbers
+    if (isNaN(gameId)) {
+        console.log("GET error:", `Invalid game id`);
+        res.status(400).json({ message: "Invalid game id" });
+        return;
+    }
+
+    try {
+        // Checks if game with id exists
+        db.oneOrNone(getGameQuery)
+            .then((data) => {
+                if (data == null) {
+                    console.log("GET error:", `Game with id ${gameId} not found`);
+                    res.status(404).json({ message: "Game not found" });
+                } else {
+                    // Checks if post with id (and game_id) exists
+                    db.manyOrNone(getPostsQuery)
+                        .then((postsData) => {
+                            res.status(200).json({ data: postsData});
+                        })
+                        .catch((error) => {
+                            console.log('GET error:', error);
+                            res.status(400).json({ message: "Bad request" });
+                        });
+                }
+            })
+            .catch((error) => {
+                console.log(`GET error:`, error);
+                res.status(400).json({ message: "Bad request" });
+            });
+
+    } catch (error) {
+        console.error(`GET error:`, error);
+        res.status(400).json({ message: "Bad request" });
+    }
+};
+
 export const getGamePostComments = async (req, res) => {
     const gameId = req.params.gameId;
     const postId = req.params.postId;
@@ -172,7 +216,7 @@ export const getGamePostComments = async (req, res) => {
                                     .then((commentsData) => {
                                         let commentsCount = commentsData != null ? commentsData.length : 0;
                                         console.log(`GET results:`, commentsData);
-                                        res.status(200).json({post: postData, commentsCount: commentsCount, comments: commentsData});
+                                        res.status(200).json({ post: postData, commentsCount: commentsCount, comments: commentsData });
                                     })
                                     .catch((error) => {
                                         console.log(`GET error:`, error);

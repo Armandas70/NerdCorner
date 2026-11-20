@@ -1,37 +1,77 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { api } from '../App';
 import Header from '../components/Header';
 import GameHeader from '../components/GameHeader';
 import CommentCard from '../components/CommentCard';
 import PostDetailsCard from '../components/PostDetailsCard';
 import SideBar from '../components/SideBar';
 
+interface Game {
+    id: number;
+    title: string;
+    description: string;
+    created_at: Date;
+}
+
+interface Post {
+    id: number;
+    title: string;
+    description: string;
+    created_at: Date;
+    is_edited: boolean;
+    creator_id: number;
+    game_id: number;
+}
+
+interface Comment {
+    id: number;
+    content: string;
+    created_at: Date;
+    is_edited: boolean;
+    creator_id: number;
+    post_id: number;
+}
+
 function PostPage() {
-    const [title, setTitle] = useState("Persona 5");
-    const [description, setDescription] = useState("This is a place to talk about the most stylistic game OAT");
-    const [createdAt, setCreatedAt] = useState("2026-09-20");
+    const { gameId, postId } = useParams();
+    const [game, setGame] = useState<Game>();
+    const [post, setPost] = useState<Post>();
+    const [comments, setComments] = useState<Comment[]>([]);
+    const [commentsCount, setCommentsCount] = useState(0);
 
-    const [pCreator, setPCreator] = useState("Vegeta64");
-    const [pTitle, setPTitle] = useState("This game is awesome");
-    const [pDescription, setPDescription] = useState("I love this game, how about yall?");
-    const [pCreatedAt, setPCreatedAt] = useState("2026-09-20");
-    const [pIsEdited, setPIsEdited] = useState(true);
+    useEffect(() => {
+        fetch(`${api}/games/${gameId}`)
+            .then((res) => {
+                if (res.status != 200) {
+                    return // show not found
+                }
+                return res.json();
+            })
+            .then((json) => {
+                //console.log("data: ", data);
+                if (json) setGame(json.data);
+            })
 
-    const [cCreator, setCCreator] = useState("TheRealGoku");
-    const [cContent, setCContent] = useState("I like it too :)");
-    const [cCreatedAt, setCCreatedAt] = useState("2026-09-20");
-    const [cIsEdited, setCIsEdited] = useState(true);
-
-
-    const comment = {
-        id: 0, creator: cCreator, content: cContent, createdAt: cCreatedAt, isEdited: cIsEdited
-    }
-    const [comments, setComments] = useState([comment, comment, comment, comment]);
+        fetch(`${api}/games/${gameId}/posts/${postId}/comments`)
+            .then((res) => res.json())
+            .then((json) => {
+                //console.log("json: ", json);
+                if (json) {
+                    setPost(json.post);
+                    setComments(json.comments);
+                    setCommentsCount(json.commentsCount);
+                }
+            })
+    }, []);
 
     return (
         <div>
             <div className='mb-5'>
                 <Header></Header>
-                <GameHeader title={title} description={description} createdAt={createdAt}></GameHeader>
+                {game && (
+                    <GameHeader title={game.title} description={game.description} created_at={game.created_at}></GameHeader>
+                )}
             </div>
 
             <div className="flex flex-row gap-40">
@@ -41,16 +81,22 @@ function PostPage() {
 
                 <div>
                     <div className='flex justify-center mb-5'>
-                        <PostDetailsCard creator={pCreator} title={pTitle} description={pDescription}
-                            createdAt={pCreatedAt} isEdited={pIsEdited}>
-                        </PostDetailsCard>
+                        {post && (
+                            <PostDetailsCard title={post.title} description={post.description} created_at={post.created_at}
+                                is_edited={post.is_edited} creator_id={post.creator_id}>
+                            </PostDetailsCard>
+                        )}
+                    </div>
+
+                    <div className='flex mb-2 text-lg text-primary font-bold'>
+                        Comments: {commentsCount}
                     </div>
 
                     <div className="grid justify-center grid-cols-1">
                         {comments.map((comment) => (
                             <div className='flex mb-3 justify-center'>
-                                <CommentCard key={comment.id} creator={comment.creator} content={comment.content}
-                                    createdAt={comment.createdAt} isEdited={comment.isEdited}>
+                                <CommentCard key={comment.id} content={comment.content} created_at={comment.created_at}
+                                    is_edited={comment.is_edited} creator_id={comment.creator_id}>
                                 </CommentCard>
                             </div>
                         ))}

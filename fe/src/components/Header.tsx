@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button, Link, SearchField, Input } from "@heroui/react"
 import LoginModal from './LoginModal';
+import SignupModal from './SignupModal';
 
 export default function Header() {
     const [isLoginModalShown, setIsLoginModalShown] = useState(false);
@@ -42,7 +43,7 @@ export default function Header() {
                 </div>
             </header>
             {isLoginModalShown && <LoginModal isOpen={isLoginModalShown} setIsOpen={setIsLoginModalShown}></LoginModal>}
-            {isSignupModalShown && <LoginModal isOpen={isSignupModalShown} setIsOpen={setIsSignupModalShown}></LoginModal>}
+            {isSignupModalShown && <SignupModal isOpen={isSignupModalShown} setIsOpen={setIsSignupModalShown}></SignupModal>}
         </div>
     );
 }
