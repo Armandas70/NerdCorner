@@ -1,5 +1,6 @@
 import { Modal, Button, Form, Input, Label } from "@heroui/react"
 import { useState } from "react"
+import { api } from '../App';
 
 interface SignupModalProps {
     isOpen: boolean;
@@ -11,8 +12,27 @@ function SignupModal({ isOpen, setIsOpen }: SignupModalProps) {
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
 
-    function handleSubmit() {
-        console.log("Tried to Sign up");
+    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        fetch(`${api}/auth/register`, {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                "username": username,
+                "email": email,
+                "password": password
+            })
+        }).then((res) => {
+            console.log("RES: ", res);
+            return res.json();
+        }).then((json) => {
+            console.log("Signup JSON: ", json);
+            if (json?.accessToken) {
+                window.localStorage.setItem("access_token", json?.accessToken);
+                window.location.reload();
+            }
+        })
+        event?.preventDefault();
     }
 
     return (
@@ -25,7 +45,7 @@ function SignupModal({ isOpen, setIsOpen }: SignupModalProps) {
                             <Modal.Heading className="text-2xl">Create your account</Modal.Heading>
                         </Modal.Header>
 
-                        <Form onSubmit={handleSubmit}>
+                        <Form onSubmit={(e) => handleSubmit(e)}>
                             <Modal.Body className="flex-row-1 w-full">
                                 <div className="flex flex-col gap-1">
                                     <Label className="text-xl" htmlFor="input-type-email">Email</Label>
@@ -72,7 +92,7 @@ function SignupModal({ isOpen, setIsOpen }: SignupModalProps) {
                                     variant="primary"
                                     size="lg"
                                     type="submit">
-                                    Log in
+                                    Sign up
                                 </Button>
                             </Modal.Footer>
                         </Form>

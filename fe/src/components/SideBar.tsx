@@ -1,39 +1,47 @@
-import { useState } from 'react';
-import { Card, Link } from "@heroui/react";
+import { useState, useEffect } from 'react';
+import { api } from '../App';
+import { Card, Link, Button } from "@heroui/react";
 
-// interface SideBarProps {
-//     games: Game[];
-// }
-
-// interface Game {
-//     id: number;
-//     title: string;
-//     description: string;
-//     createdAt: string;
-// }
+interface Game {
+    id: number;
+    title: string;
+    description: string;
+    created_at: Date;
+}
 
 function SideBar() {
-    const [title, setTitle] = useState("Persona 5");
-    const [description, setDescription] = useState("This is a place to talk about the most stylistic game OAT");
-    const [createdAt, setCreatedAt] = useState("2026-09-20");
+    const [games, setGames] = useState<Game[]>([]);
 
-    const game = {
-        id: 0, title, description, createdAt
-    }
-    const [games, setGames] = useState([game, game, game]);
+    useEffect(() => {
+        fetch(`${api}/games`)
+            .then((res) => res?.json())
+            .then((json) => {
+                setGames(json?.data)
+            })
+    }, []);
 
     return (
         <div className="ml-1 space-y-4">
             <Card className="max-w-xs h-5xl border-1 border-solid border-secondary">
                 <Card.Header className="ml-2">
-                    <Card.Title className="text-2xl text-primary">Games</Card.Title>
+                    <div className="grid grid-cols-8">
+                        <Card.Title className="text-2xl text-primary col-span-6">Games</Card.Title>
+                        <div className="col-span-2">
+                            <Button
+                                size='md'
+                                onClick={() => { }}
+                            >
+                                + Add
+                            </Button>
+                        </div>
+                    </div>
                 </Card.Header>
                 <Card.Content>
                     {games.map((game) => (
                         <div>
                             <Link
                                 key={game.id}
-                                href={`/game/${game.id}`}
+                                href={`/games/${game.id}`}
                                 className="flex items-center p-1 hover:underline"
                             >
                                 <div className="flex-1">

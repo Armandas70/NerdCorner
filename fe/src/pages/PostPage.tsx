@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { api } from '../App';
+import { Button } from '@heroui/react';
 import Header from '../components/Header';
 import GameHeader from '../components/GameHeader';
 import CommentCard from '../components/CommentCard';
@@ -88,8 +89,15 @@ function PostPage() {
                         )}
                     </div>
 
-                    <div className='flex mb-2 text-lg text-primary font-bold'>
-                        Comments: {commentsCount}
+                    <div className="grid grid-cols-13 mb-2">
+                        <div className='flex mb-2 text-lg text-primary font-bold col-span-11'>
+                            Comments: {commentsCount}
+                        </div>
+                        <div className="col-span-2">
+                            <Button size='lg' onClick={() => { }}>
+                                + Add comment
+                            </Button>
+                        </div>
                     </div>
 
                     <div className="grid justify-center grid-cols-1">

@@ -1,11 +1,17 @@
 import { useState } from 'react';
 import { Button, Link, SearchField, Input } from "@heroui/react"
+import { isUser } from '../middleware/auth';
 import LoginModal from './LoginModal';
 import SignupModal from './SignupModal';
 
 export default function Header() {
     const [isLoginModalShown, setIsLoginModalShown] = useState(false);
     const [isSignupModalShown, setIsSignupModalShown] = useState(false);
+
+    function handleLogout() {
+        window.localStorage.clear();
+        window.location.replace("/");
+    }
 
     //className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground
 
@@ -39,6 +45,15 @@ export default function Header() {
                         >
                             Sign Up
                         </Button>
+                        {isUser() && (
+                            <Button
+                                variant="danger-soft"
+                                size="lg"
+                                onClick={handleLogout}
+                            >
+                                Log out
+                            </Button>
+                        )}
                     </div>
                 </div>
             </header>

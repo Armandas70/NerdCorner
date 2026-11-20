@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../App';
+import { Button } from '@heroui/react';
 import Header from '../components/Header';
 import GameHeader from '../components/GameHeader';
 import PostCard from '../components/PostCard';
@@ -77,14 +78,22 @@ function GamePage() {
                     <SideBar></SideBar>
                 </aside>
 
-                <div className="grid justify-center grid-cols-1">
-                    {posts.filter(p => gameId ? p.game_id === parseInt(gameId) : p).map((post) => (
-                        <div className='flex mb-3 justify-center' onClick={() => navigate(`/games/${gameId}/posts/${post.id}`)}>
-                            <PostCard key={post.id} title={post.title} description={post.description}
-                                created_at={post.created_at} is_edited={post.is_edited} creator_id={post.creator_id}>
-                            </PostCard>
-                        </div>
-                    ))}
+                <div className="grid">
+                    <div className="mb-3">
+                        <Button size='lg' onClick={() => { }}>
+                            + Create post
+                        </Button>
+                    </div>
+
+                    <div className="grid justify-center grid-cols-1">
+                        {posts.filter(p => gameId ? p.game_id === parseInt(gameId) : p).map((post) => (
+                            <div className='flex mb-3 justify-center' onClick={() => navigate(`/games/${gameId}/posts/${post.id}`)}>
+                                <PostCard key={post.id} title={post.title} description={post.description}
+                                    created_at={post.created_at} is_edited={post.is_edited} creator_id={post.creator_id}>
+                                </PostCard>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 

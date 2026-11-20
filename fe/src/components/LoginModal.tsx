@@ -1,17 +1,36 @@
 import { Modal, Button, Form, Input, Label } from "@heroui/react"
 import { useState } from "react"
+import { api } from '../App';
 
 interface LoginModalProps {
     isOpen: boolean;
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {
+function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    function handleSubmit() {
-        console.log("Tried to log in");
+    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        fetch(`${api}/auth/login`, {
+            method: 'post',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({
+                "email": email,
+                "password": password
+            })
+        }).then((res) => {
+            console.log("RES: ", res);
+            return res.json();
+        }).then((json) => {
+            console.log("Login JSON: ", json);
+            if (json?.accessToken) {
+                window.localStorage.setItem("access_token", json?.accessToken);
+                window.location.reload();
+            }
+        })
+        event?.preventDefault();
     }
 
     return (
@@ -24,7 +43,7 @@ function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {
                             <Modal.Heading className="text-2xl">Log in to your account</Modal.Heading>
                         </Modal.Header>
 
-                        <Form onSubmit={handleSubmit}>
+                        <Form onSubmit={(e) => handleSubmit(e)}>
                             <Modal.Body className="flex-row-1 w-full">
                                 <div className="flex flex-col gap-1">
                                     <Label className="text-xl" htmlFor="input-type-email">Email</Label>

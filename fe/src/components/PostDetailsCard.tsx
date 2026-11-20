@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../App';
-import { Card } from "@heroui/react";
+import { Card, Button } from "@heroui/react";
 
 interface PostDetailsProps {
     title: string;
@@ -37,17 +37,41 @@ function PostDetailsCard({
     return (
         <Card className="max-w-5xl w-full border-1 border-solid border-secondary">
             <Card.Header>
-                <div className="flex flex-row items-left justify-left w-1/2 gap-x-2">
-                    <Card.Title className="text-xl text-primary font-bold">• {username}</Card.Title>
-                </div>
-                <Card.Description className="text-xl text-primary">
-                    <div className="flex gap-2 items-left justify-left">
-                        <p>Created at: {dateToString(created_at)}</p>
-                        {is_edited && <p>• Edited</p>}
+                <div className="grid grid-cols-12">
+                    <div className="flex col-span-10 grid grid-rows-3 gap-0">
+                        <div className="flex flex-row items-left justify-left w-1/2 gap-x-2">
+                            <Card.Title className="text-xl text-primary font-bold">• {username}</Card.Title>
+                        </div>
+                        <Card.Description className="text-xl text-primary">
+                            <div className="flex gap-2 items-left justify-left">
+                                <p>Created at: {dateToString(created_at)}</p>
+                                {is_edited && <p>• Edited</p>}
+                            </div>
+                        </Card.Description>
+                        <div>
+                            <h1 className="text-3xl font-bold">{title}</h1>
+                        </div>
                     </div>
-                </Card.Description>
-                <div>
-                    <h1 className="text-3xl font-bold">{title}</h1>
+
+                    <div className="flex col-span-2">
+                        <Card.Title className='flex items-right justify-right mb-3'>
+                            <div className="flex gap-2">
+                                <Button
+                                    size="lg"
+                                    onClick={() => { }}
+                                >
+                                    Edit
+                                </Button>
+                                <Button
+                                    variant="danger-soft"
+                                    size="lg"
+                                    onClick={() => { }}
+                                >
+                                    Delete
+                                </Button>
+                            </div>
+                        </Card.Title>
+                    </div>
                 </div>
             </Card.Header>
             <Card.Content>
