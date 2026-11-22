@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard';
 import Header from '../components/Header';
 import SideBar from '../components/SideBar';
+import HomeHeader from '../components/HomeHeader';
 
 interface Game {
   id: number;
@@ -15,19 +16,28 @@ interface Game {
 function HomePage() {
   const navigate = useNavigate();
   const [games, setGames] = useState<Game[]>([]);
+  const [filterText, setFilterText] = useState("");
 
   useEffect(() => {
-    fetch(`${api}/games`)
-      .then((res) => res?.json())
-      .then((json) => {
-        setGames(json?.data)
-      })
-  }, []);
+    if (filterText) {
+      fetch(`${api}/games?title=${filterText}`)
+        .then((res) => res?.json())
+        .then((json) => {
+          setGames(json?.data)
+        })
+    } else {
+      fetch(`${api}/games`)
+        .then((res) => res?.json())
+        .then((json) => {
+          setGames(json?.data)
+        })
+    }
+  }, [filterText]);
 
   return (
     <div>
       <div className='mb-5'>
-        <Header></Header>
+        <HomeHeader filterText={filterText} setFilterText={setFilterText}></HomeHeader>
       </div>
 
       <div className="flex flex-row gap-40">
