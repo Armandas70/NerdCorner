@@ -15,7 +15,7 @@ export const db = pgp()(connection);
 
 
 // Lists all rows of the given table (using pagination)
-export const listAll = async (req, res, table, limit = 3, filterableValues) => {
+export const listAll = async (req, res, table, limit = 5, filterableValues) => {
     let page = req.query.page || 1;
     let filters = "";
 

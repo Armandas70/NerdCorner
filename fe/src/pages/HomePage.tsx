@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../App';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard';
-import Header from '../components/Header';
+import Pages from '../components/Pages';
 import SideBar from '../components/SideBar';
 import HomeHeader from '../components/HomeHeader';
 
@@ -14,25 +14,43 @@ interface Game {
 }
 
 function HomePage() {
+  const elementsInPage = 5;
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const [games, setGames] = useState<Game[]>([]);
   const [filterText, setFilterText] = useState("");
 
   useEffect(() => {
-    if (filterText) {
-      fetch(`${api}/games?title=${filterText}`)
+    function getTotalPages(page: number) {
+      fetch(`${api}/games?page=${page}&title=${filterText}`)
         .then((res) => res?.json())
         .then((json) => {
-          setGames(json?.data)
-        })
-    } else {
-      fetch(`${api}/games`)
-        .then((res) => res?.json())
-        .then((json) => {
-          setGames(json?.data)
+          if (json?.data?.length === elementsInPage) {
+
+            fetch(json?.links?.next)
+              .then((res) => res?.json())
+              .then((json) => {
+                if (json?.data?.length > 0) {
+                  getTotalPages(page + 1);
+                } else {
+                  setTotalPages(page);
+                }
+              })
+
+          } else {
+            setTotalPages(page);
+          }
         })
     }
-  }, [filterText]);
+    getTotalPages(1);
+
+    fetch(`${api}/games?page=${page}&title=${filterText}`)
+      .then((res) => res?.json())
+      .then((json) => {
+        setGames(json?.data)
+      })
+  }, [filterText, page]);
 
   return (
     <div>
@@ -53,6 +71,8 @@ function HomePage() {
           ))}
         </div>
       </div>
+
+      <Pages page={page} setPage={setPage} totalPages={totalPages}></Pages>
 
     </div>
   )
