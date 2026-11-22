@@ -1,8 +1,11 @@
 import { useEffect, useState } from 'react';
 import { api } from '../App';
 import { Card, Button } from "@heroui/react";
+import CommentEditModal from './CommentEditModal';
+import CommentDeleteModal from './CommentDeleteModal';
 
 interface CommentCardProps {
+    id: number;
     content: string;
     created_at: Date;
     is_edited: boolean;
@@ -15,8 +18,10 @@ function dateToString(date: Date) {
 
 // Ideal CommentCard has classname="w-3xl"
 
-function CommentCard({ content, created_at, is_edited, creator_id }: CommentCardProps) {
+function CommentCard({ id, content, created_at, is_edited, creator_id }: CommentCardProps) {
     const [username, setUsername] = useState("");
+    const [isCommentEditModalShown, setIsCommentEditModalShown] = useState(false);
+    const [isCommentDeleteModalShown, setIsCommentDeleteModalShown] = useState(false);
 
     useEffect(() => {
         fetch(`${api}/users/${creator_id}`)
@@ -51,14 +56,14 @@ function CommentCard({ content, created_at, is_edited, creator_id }: CommentCard
                                 <div className="flex gap-2">
                                     <Button
                                         size="lg"
-                                        onClick={() => { }}
+                                        onClick={() => setIsCommentEditModalShown(true)}
                                     >
                                         Edit
                                     </Button>
                                     <Button
                                         variant="danger-soft"
                                         size="lg"
-                                        onClick={() => { }}
+                                        onClick={() => setIsCommentDeleteModalShown(true)}
                                     >
                                         Delete
                                     </Button>
@@ -71,6 +76,25 @@ function CommentCard({ content, created_at, is_edited, creator_id }: CommentCard
                     <p className="text-xl">{content}</p>
                 </Card.Content>
             </Card>
+
+            {isCommentEditModalShown && (
+                <CommentEditModal 
+                    isOpen={isCommentEditModalShown} 
+                    setIsOpen={setIsCommentEditModalShown}
+                    id={id}
+                    content={content}
+                >
+                </CommentEditModal>
+            )}
+            {isCommentDeleteModalShown && (
+                <CommentDeleteModal 
+                    isOpen={isCommentDeleteModalShown} 
+                    setIsOpen={setIsCommentDeleteModalShown}
+                    id={id}
+                >
+                </CommentDeleteModal>
+            )}
+
         </div>
     )
 }

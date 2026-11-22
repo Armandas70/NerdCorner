@@ -47,38 +47,40 @@ function SignupModal({ isOpen, setIsOpen }: SignupModalProps) {
 
                         <Form onSubmit={(e) => handleSubmit(e)}>
                             <Modal.Body className="flex-row-1 w-full">
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xl" htmlFor="input-type-email">Email</Label>
-                                    <Input
-                                        className="text-xl"
-                                        id="input-type-email"
-                                        placeholder="Enter your email"
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xl" htmlFor="input-type-password">Password</Label>
-                                    <Input
-                                        className="text-xl"
-                                        id="input-type-password"
-                                        placeholder="Enter your password"
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xl" htmlFor="input-type-username">Username</Label>
-                                    <Input
-                                        className="text-xl"
-                                        id="input-type-username"
-                                        placeholder="Enter your username"
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                    />
+                                <div className="grid grid-rows-3 gap-5">
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xl" htmlFor="input-type-email">Email</Label>
+                                        <Input
+                                            className="text-xl"
+                                            id="input-type-email"
+                                            placeholder="Enter your email"
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xl" htmlFor="input-type-password">Password</Label>
+                                        <Input
+                                            className="text-xl"
+                                            id="input-type-password"
+                                            placeholder="Enter your password"
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xl" htmlFor="input-type-username">Username</Label>
+                                        <Input
+                                            className="text-xl"
+                                            id="input-type-username"
+                                            placeholder="Enter your username"
+                                            type="text"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
                             </Modal.Body>
                             <Modal.Footer>

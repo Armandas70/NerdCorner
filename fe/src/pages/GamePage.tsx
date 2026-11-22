@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import GameHeader from '../components/GameHeader';
 import PostCard from '../components/PostCard';
 import SideBar from '../components/SideBar';
+import PostAddModal from '../components/PostAddModal';
 
 interface Game {
     id: number;
@@ -39,6 +40,7 @@ function GamePage() {
     //     id: 0, creator: pCreator, title: pTitle, description: pDescription, createdAt: pCreatedAt, isEdited: pIsEdited
     // }
     const [posts, setPosts] = useState<Post[]>([]);
+    const [isPostAddModalShown, setIsPostAddModalShown] = useState(false);
 
     useEffect(() => {
         fetch(`${api}/games/${gameId}`)
@@ -69,7 +71,7 @@ function GamePage() {
             <div className='mb-5'>
                 <Header></Header>
                 {game && (
-                    <GameHeader title={game.title} description={game.description} created_at={game.created_at}></GameHeader>
+                    <GameHeader id={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameHeader>
                 )}
             </div>
 
@@ -80,7 +82,7 @@ function GamePage() {
 
                 <div className="grid">
                     <div className="mb-3">
-                        <Button size='lg' onClick={() => { }}>
+                        <Button size='lg' onClick={() => setIsPostAddModalShown(true)}>
                             + Create post
                         </Button>
                     </div>
@@ -97,6 +99,14 @@ function GamePage() {
                 </div>
             </div>
 
+            {isPostAddModalShown && game && (
+                <PostAddModal
+                    isOpen={isPostAddModalShown}
+                    setIsOpen={setIsPostAddModalShown}
+                    gameId={game.id}
+                >
+                </PostAddModal>
+            )}
 
         </div>
     )

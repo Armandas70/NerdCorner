@@ -7,7 +7,8 @@ interface LoginModalProps {
     setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {;
+function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {
+    ;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -45,27 +46,29 @@ function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {;
 
                         <Form onSubmit={(e) => handleSubmit(e)}>
                             <Modal.Body className="flex-row-1 w-full">
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xl" htmlFor="input-type-email">Email</Label>
-                                    <Input
-                                        className="text-xl"
-                                        id="input-type-email"
-                                        placeholder="Enter your email"
-                                        type="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                    />
-                                </div>
-                                <div className="flex flex-col gap-1">
-                                    <Label className="text-xl" htmlFor="input-type-password">Password</Label>
-                                    <Input
-                                        className="text-xl"
-                                        id="input-type-password"
-                                        placeholder="Enter your password"
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
+                                <div className="grid grid-rows-2 gap-5">
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xl" htmlFor="input-type-email">Email</Label>
+                                        <Input
+                                            className="text-xl"
+                                            id="input-type-email"
+                                            placeholder="Enter your email"
+                                            type="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                        />
+                                    </div>
+                                    <div className="flex flex-col gap-1">
+                                        <Label className="text-xl" htmlFor="input-type-password">Password</Label>
+                                        <Input
+                                            className="text-xl"
+                                            id="input-type-password"
+                                            placeholder="Enter your password"
+                                            type="password"
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
+                                    </div>
                                 </div>
                             </Modal.Body>
                             <Modal.Footer>

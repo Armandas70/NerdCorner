@@ -7,6 +7,7 @@ import GameHeader from '../components/GameHeader';
 import CommentCard from '../components/CommentCard';
 import PostDetailsCard from '../components/PostDetailsCard';
 import SideBar from '../components/SideBar';
+import CommentAddModal from '../components/CommentAddModal';
 
 interface Game {
     id: number;
@@ -41,6 +42,8 @@ function PostPage() {
     const [comments, setComments] = useState<Comment[]>([]);
     const [commentsCount, setCommentsCount] = useState(0);
 
+    const [isCommentAddModalShown, setIsCommentAddModalShown] = useState(false)
+
     useEffect(() => {
         fetch(`${api}/games/${gameId}`)
             .then((res) => {
@@ -71,7 +74,7 @@ function PostPage() {
             <div className='mb-5'>
                 <Header></Header>
                 {game && (
-                    <GameHeader title={game.title} description={game.description} created_at={game.created_at}></GameHeader>
+                    <GameHeader id={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameHeader>
                 )}
             </div>
 
@@ -83,8 +86,8 @@ function PostPage() {
                 <div>
                     <div className='flex justify-center mb-5'>
                         {post && (
-                            <PostDetailsCard title={post.title} description={post.description} created_at={post.created_at}
-                                is_edited={post.is_edited} creator_id={post.creator_id}>
+                            <PostDetailsCard id={post.id} title={post.title} description={post.description} 
+                                created_at={post.created_at} is_edited={post.is_edited} creator_id={post.creator_id}>
                             </PostDetailsCard>
                         )}
                     </div>
@@ -94,7 +97,7 @@ function PostPage() {
                             Comments: {commentsCount}
                         </div>
                         <div className="col-span-2">
-                            <Button size='lg' onClick={() => { }}>
+                            <Button size='lg' onClick={() => setIsCommentAddModalShown(true)}>
                                 + Add comment
                             </Button>
                         </div>
@@ -103,7 +106,7 @@ function PostPage() {
                     <div className="grid justify-center grid-cols-1">
                         {comments.map((comment) => (
                             <div className='flex mb-3 justify-center'>
-                                <CommentCard key={comment.id} content={comment.content} created_at={comment.created_at}
+                                <CommentCard key={comment.id} id={comment.id} content={comment.content} created_at={comment.created_at}
                                     is_edited={comment.is_edited} creator_id={comment.creator_id}>
                                 </CommentCard>
                             </div>
@@ -111,6 +114,15 @@ function PostPage() {
                     </div>
                 </div>
             </div>
+
+            {isCommentAddModalShown && post && (
+                <CommentAddModal
+                    isOpen={isCommentAddModalShown}
+                    setIsOpen={setIsCommentAddModalShown}
+                    postId={post.id}
+                >
+                </CommentAddModal>
+            )}
 
         </div>
     )

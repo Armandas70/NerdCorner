@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { api } from '../App';
 import { Card, Link, Button } from "@heroui/react";
+import GameAddModal from './GameAddModal';
 
 interface Game {
     id: number;
@@ -11,6 +12,7 @@ interface Game {
 
 function SideBar() {
     const [games, setGames] = useState<Game[]>([]);
+    const [isGameAddModalShown, setIsGameAddModalShown] = useState(false);
 
     useEffect(() => {
         fetch(`${api}/games`)
@@ -29,7 +31,7 @@ function SideBar() {
                         <div className="col-span-2">
                             <Button
                                 size='md'
-                                onClick={() => { }}
+                                onClick={() => setIsGameAddModalShown(true)}
                             >
                                 + Add
                             </Button>
@@ -53,6 +55,7 @@ function SideBar() {
                     ))}
                 </Card.Content>
             </Card>
+            {isGameAddModalShown && <GameAddModal isOpen={isGameAddModalShown} setIsOpen={setIsGameAddModalShown}></GameAddModal>}
         </div>
     )
 }
