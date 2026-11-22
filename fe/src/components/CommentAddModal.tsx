@@ -10,6 +10,7 @@ interface CommentAddModalProps {
 
 function CommentAddModal({ isOpen, setIsOpen, postId }: CommentAddModalProps) {
     const [content, setContent] = useState("");
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/comments`, {
@@ -26,7 +27,7 @@ function CommentAddModal({ isOpen, setIsOpen, postId }: CommentAddModalProps) {
         }).then((json) => {
             console.log("Comment Add JSON: ", json);
             if (json?.message) {
-                return;
+                setError(json?.message);
             } else {
                 window.location.reload();
             }
@@ -42,6 +43,7 @@ function CommentAddModal({ isOpen, setIsOpen, postId }: CommentAddModalProps) {
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Create comment</Modal.Heading>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

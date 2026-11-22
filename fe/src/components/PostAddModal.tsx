@@ -11,6 +11,7 @@ interface PostAddModalProps {
 function PostAddModal({ isOpen, setIsOpen, gameId }: PostAddModalProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/posts`, {
@@ -28,7 +29,7 @@ function PostAddModal({ isOpen, setIsOpen, gameId }: PostAddModalProps) {
         }).then((json) => {
             console.log("Post Add JSON: ", json);
             if (json?.message) {
-                return;
+                setError(json?.message);
             } else {
                 window.location.reload();
             }
@@ -44,6 +45,7 @@ function PostAddModal({ isOpen, setIsOpen, gameId }: PostAddModalProps) {
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Create post</Modal.Heading>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

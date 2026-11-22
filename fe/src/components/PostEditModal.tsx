@@ -13,6 +13,7 @@ interface PostEditModalProps {
 function PostEditModal({ isOpen, setIsOpen, id, title, description }: PostEditModalProps) {
     const [newTitle, setNewTitle] = useState(title);
     const [newDescription, setNewDescription] = useState(description);
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/posts/${id}`, {
@@ -29,7 +30,7 @@ function PostEditModal({ isOpen, setIsOpen, id, title, description }: PostEditMo
         }).then((json) => {
             console.log("Post Edit JSON: ", json);
             if (json?.message) {
-                return;
+                setError(json?.message);
             } else {
                 window.location.reload();
             }
@@ -45,6 +46,7 @@ function PostEditModal({ isOpen, setIsOpen, id, title, description }: PostEditMo
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Edit post</Modal.Heading>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

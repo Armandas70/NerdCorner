@@ -11,6 +11,7 @@ function SignupModal({ isOpen, setIsOpen }: SignupModalProps) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [username, setUsername] = useState("");
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/auth/register`, {
@@ -30,6 +31,8 @@ function SignupModal({ isOpen, setIsOpen }: SignupModalProps) {
             if (json?.accessToken) {
                 window.localStorage.setItem("access_token", json?.accessToken);
                 window.location.reload();
+            } else if (json?.message) {
+                setError(json?.message);
             }
         })
         event?.preventDefault();
@@ -43,6 +46,7 @@ function SignupModal({ isOpen, setIsOpen }: SignupModalProps) {
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Create your account</Modal.Heading>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

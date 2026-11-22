@@ -11,6 +11,7 @@ interface CommentEditModalProps {
 
 function CommentEditModal({ isOpen, setIsOpen, id, content }: CommentEditModalProps) {
     const [newContent, setNewContent] = useState(content);
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/comments/${id}`, {
@@ -26,7 +27,7 @@ function CommentEditModal({ isOpen, setIsOpen, id, content }: CommentEditModalPr
         }).then((json) => {
             console.log("Comment Edit JSON: ", json);
             if (json?.message) {
-                return;
+                setError(json?.message);
             } else {
                 window.location.reload();
             }
@@ -42,6 +43,7 @@ function CommentEditModal({ isOpen, setIsOpen, id, content }: CommentEditModalPr
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Edit comment</Modal.Heading>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

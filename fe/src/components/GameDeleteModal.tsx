@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Modal, Button, Form } from "@heroui/react"
 import { api } from '../App';
 
@@ -8,6 +9,7 @@ interface GameDeleteModalProps {
 }
 
 function GameDeleteModal({ isOpen, setIsOpen, id }: GameDeleteModalProps) {
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/games/${id}`, {
@@ -20,7 +22,7 @@ function GameDeleteModal({ isOpen, setIsOpen, id }: GameDeleteModalProps) {
         }).then((json) => {
             console.log("Game Delete JSON: ", json);
             if (json?.message) {
-                return;
+                setError(json?.message);
             } else {
                 window.location.replace("/");
             }
@@ -37,6 +39,7 @@ function GameDeleteModal({ isOpen, setIsOpen, id }: GameDeleteModalProps) {
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Delete game</Modal.Heading>
                             <p className="text-lg">Are you sure you want to delete this game?</p>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

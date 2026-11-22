@@ -10,6 +10,7 @@ interface GameAddModalProps {
 function GameAddModal({ isOpen, setIsOpen }: GameAddModalProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/games`, {
@@ -26,7 +27,7 @@ function GameAddModal({ isOpen, setIsOpen }: GameAddModalProps) {
         }).then((json) => {
             console.log("Game Add JSON: ", json);
             if (json?.message) {
-                return;
+                setError(json?.message);
             } else {
                 window.location.reload();
             }
@@ -42,6 +43,7 @@ function GameAddModal({ isOpen, setIsOpen }: GameAddModalProps) {
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Create game</Modal.Heading>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

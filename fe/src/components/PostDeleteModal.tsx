@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Modal, Button, Form} from "@heroui/react"
 import { api } from '../App';
 import { useNavigate } from 'react-router-dom';
@@ -10,6 +11,7 @@ interface PostDeleteModalProps {
 
 function PostDeleteModal({ isOpen, setIsOpen, id }: PostDeleteModalProps) {
     const navigate = useNavigate();
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/posts/${id}`, {
@@ -22,7 +24,7 @@ function PostDeleteModal({ isOpen, setIsOpen, id }: PostDeleteModalProps) {
         }).then((json) => {
             console.log("Post Delete JSON: ", json);
             if (json?.message) {
-                return;
+                setError(json?.message);
             } else {
                 navigate(-1);
             }
@@ -39,6 +41,7 @@ function PostDeleteModal({ isOpen, setIsOpen, id }: PostDeleteModalProps) {
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Delete post</Modal.Heading>
                             <p className="text-lg">Are you sure you want to delete this post?</p>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>

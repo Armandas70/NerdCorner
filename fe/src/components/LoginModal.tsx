@@ -1,4 +1,4 @@
-import { Modal, Button, Form, Input, Label } from "@heroui/react"
+import { Modal, Button, Form, Input, Label, ErrorMessage } from "@heroui/react"
 import { useState } from "react"
 import { api } from '../App';
 
@@ -8,9 +8,9 @@ interface LoginModalProps {
 }
 
 function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {
-    ;
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [error, setError] = useState(null);
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         fetch(`${api}/auth/login`, {
@@ -29,6 +29,8 @@ function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {
             if (json?.accessToken) {
                 window.localStorage.setItem("access_token", json?.accessToken);
                 window.location.reload();
+            } else if (json?.message) {
+                setError(json?.message);
             }
         })
         event?.preventDefault();
@@ -42,6 +44,7 @@ function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
                             <Modal.Heading className="text-2xl">Log in to your account</Modal.Heading>
+                            {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>
 
                         <Form onSubmit={(e) => handleSubmit(e)}>
