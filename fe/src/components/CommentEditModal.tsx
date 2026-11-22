@@ -24,7 +24,7 @@ function CommentEditModal({ isOpen, setIsOpen, id, content }: CommentEditModalPr
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Comment Edit JSON: ", json);
             if (json?.message) {
                 return;
             } else {

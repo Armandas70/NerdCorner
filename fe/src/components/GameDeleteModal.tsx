@@ -18,7 +18,7 @@ function GameDeleteModal({ isOpen, setIsOpen, id }: GameDeleteModalProps) {
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Game Delete JSON: ", json);
             if (json?.message) {
                 return;
             } else {

@@ -20,7 +20,7 @@ function PostDeleteModal({ isOpen, setIsOpen, id }: PostDeleteModalProps) {
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Post Delete JSON: ", json);
             if (json?.message) {
                 return;
             } else {

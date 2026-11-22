@@ -18,7 +18,7 @@ function CommentDeleteModal({ isOpen, setIsOpen, id }: CommentDeleteModalProps) 
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Comment Delete JSON: ", json);
             if (json?.message) {
                 return;
             } else {

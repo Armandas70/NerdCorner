@@ -13,13 +13,6 @@ interface Game {
 }
 
 function HomePage() {
-  // const [title, setTitle] = useState("Persona 5");
-  // const [description, setDescription] = useState("This is a place to talk about the most stylistic game OAT");
-  // const [createdAt, setCreatedAt] = useState("2026-09-20");
-
-  // const game = {
-  //   id: 0, title, description, createdAt
-  // }
   const navigate = useNavigate();
   const [games, setGames] = useState<Game[]>([]);
 

@@ -27,7 +27,7 @@ function GameEditModal({ isOpen, setIsOpen, id, title, description }: GameEditMo
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Game Edit JSON: ", json);
             if (json?.message) {
                 return;
             } else {

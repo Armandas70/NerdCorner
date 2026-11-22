@@ -27,7 +27,7 @@ function PostEditModal({ isOpen, setIsOpen, id, title, description }: PostEditMo
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Post Edit JSON: ", json);
             if (json?.message) {
                 return;
             } else {

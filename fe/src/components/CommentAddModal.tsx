@@ -24,7 +24,7 @@ function CommentAddModal({ isOpen, setIsOpen, postId }: CommentAddModalProps) {
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Comment Add JSON: ", json);
             if (json?.message) {
                 return;
             } else {

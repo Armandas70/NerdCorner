@@ -26,7 +26,7 @@ function PostAddModal({ isOpen, setIsOpen, gameId }: PostAddModalProps) {
             console.log("RES: ", res);
             return res.json();
         }).then((json) => {
-            console.log("Login JSON: ", json);
+            console.log("Post Add JSON: ", json);
             if (json?.message) {
                 return;
             } else {

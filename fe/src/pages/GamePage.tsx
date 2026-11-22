@@ -29,16 +29,6 @@ function GamePage() {
     const { gameId } = useParams();
     const navigate = useNavigate();
     const [game, setGame] = useState<Game>();
-
-    // const [pCreator, setPCreator] = useState("Vegeta64");
-    // const [pTitle, setPTitle] = useState("This game is awesome");
-    // const [pDescription, setPDescription] = useState("I love this game, how about yall?");
-    // const [pCreatedAt, setPCreatedAt] = useState("2026-09-20");
-    // const [pIsEdited, setPIsEdited] = useState(true);
-
-    // const post = {
-    //     id: 0, creator: pCreator, title: pTitle, description: pDescription, createdAt: pCreatedAt, isEdited: pIsEdited
-    // }
     const [posts, setPosts] = useState<Post[]>([]);
     const [isPostAddModalShown, setIsPostAddModalShown] = useState(false);
 
