@@ -73,7 +73,7 @@ function HomePage() {
 
         <div className="grid grid-cols-1 justify-center">
           {games.map((game) => (
-            <div key={game.id} className='flex mb-3 justify-center' onClick={() => navigate(`/games/${game.id}`)}>
+            <div key={game.id} className='flex mb-3 justify-center hover:animate-pulse' onClick={() => navigate(`/games/${game.id}`)}>
               <GameCard key={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameCard>
             </div>
           ))}

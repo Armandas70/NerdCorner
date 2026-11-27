@@ -21,7 +21,7 @@ export default function UserMenu() {
         <div>
             <Dropdown>
                 <Button aria-label="Menu" variant="primary">
-                    <img src={settings} alt='settings svg' width={30}></img>
+                    <img src={settings} alt='settings svg' width={30} className='hover:animate-spin'></img>
                 </Button>
                 <Dropdown.Popover>
                     <Dropdown.Menu onAction={(key) => console.log(`Selected: ${key}`)}>
