@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '../App';
 import { Card } from "@heroui/react";
+import edited from '../assets/edit.svg';
 
 interface PostCardProps {
     title: string;
@@ -37,7 +38,11 @@ function PostCard({ title, description, created_at, is_edited, creator_id }: Pos
                     <Card.Description className="text-xl text-primary mb-1 font-bold">• {username}</Card.Description>
                     <Card.Title className="text-3xl mb-2">{title}</Card.Title>
                     <Card.Description className="text-xl text-primary">{dateToString(created_at)}</Card.Description>
-                    {is_edited && <Card.Description className="text-xl text-primary">Edited</Card.Description>}
+                    {is_edited && (
+                        <div className='mt-1'>
+                            <img src={edited} width={20} />
+                        </div>
+                    )}
                 </Card.Header>
                 <Card.Content>
                     <p className="text-xl">{description}</p>

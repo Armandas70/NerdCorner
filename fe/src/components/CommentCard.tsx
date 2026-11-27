@@ -3,6 +3,7 @@ import { api } from '../App';
 import { Card, Button } from "@heroui/react";
 import CommentEditModal from './CommentEditModal';
 import CommentDeleteModal from './CommentDeleteModal';
+import edited from '../assets/edit.svg';
 
 interface CommentCardProps {
     id: number;
@@ -46,7 +47,12 @@ function CommentCard({ id, content, created_at, is_edited, creator_id }: Comment
                             <Card.Description className="text-xl text-primary">
                                 <div className="flex gap-2 items-left justify-left">
                                     <p>Created at: {dateToString(created_at)}</p>
-                                    {is_edited && <p>• Edited</p>}
+                                    {is_edited && (
+                                        <div className='grid grid-cols-2'>
+                                            <p>•</p>
+                                            <img src={edited} width={20}/>
+                                        </div>
+                                    )}
                                 </div>
                             </Card.Description>
                         </div>

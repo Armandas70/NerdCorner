@@ -1,8 +1,6 @@
-import { useState } from 'react';
-import { Button, Link, SearchField, Input } from "@heroui/react"
-import { isUser } from '../middleware/auth';
-import LoginModal from './LoginModal';
-import SignupModal from './SignupModal';
+// import { useState } from 'react';
+import { Link, SearchField, Input } from "@heroui/react"
+import UserMenu from './UserMenu';
 
 interface HomeHeaderProps {
     filterText: string;
@@ -10,14 +8,6 @@ interface HomeHeaderProps {
 }
 
 export default function HomeHeader({ filterText, setFilterText }: HomeHeaderProps) {
-    const [isLoginModalShown, setIsLoginModalShown] = useState(false);
-    const [isSignupModalShown, setIsSignupModalShown] = useState(false);
-
-    function handleLogout() {
-        window.localStorage.clear();
-        window.location.replace("/");
-    }
-
     //className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground
 
     return (
@@ -38,34 +28,9 @@ export default function HomeHeader({ filterText, setFilterText }: HomeHeaderProp
                             />
                         </div>
                     </div>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="lg"
-                            onClick={() => setIsLoginModalShown(true)}
-                        >
-                            Log In
-                        </Button>
-                        <Button
-                            size="lg"
-                            onClick={() => setIsSignupModalShown(true)}
-                        >
-                            Sign Up
-                        </Button>
-                        {isUser() && (
-                            <Button
-                                variant="danger-soft"
-                                size="lg"
-                                onClick={handleLogout}
-                            >
-                                Log out
-                            </Button>
-                        )}
-                    </div>
+                    <UserMenu></UserMenu>
                 </div>
             </header>
-            {isLoginModalShown && <LoginModal isOpen={isLoginModalShown} setIsOpen={setIsLoginModalShown}></LoginModal>}
-            {isSignupModalShown && <SignupModal isOpen={isSignupModalShown} setIsOpen={setIsSignupModalShown}></SignupModal>}
         </div>
     );
 }

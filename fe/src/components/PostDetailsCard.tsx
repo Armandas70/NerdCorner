@@ -3,6 +3,7 @@ import { api } from '../App';
 import { Card, Button } from "@heroui/react";
 import PostEditModal from '../components/PostEditModal';
 import PostDeleteModal from '../components/PostDeleteModal';
+import edited from '../assets/edit.svg';
 
 interface PostDetailsProps {
     id: number;
@@ -52,7 +53,12 @@ function PostDetailsCard({
                             <Card.Description className="text-xl text-primary">
                                 <div className="flex gap-2 items-left justify-left">
                                     <p>Created at: {dateToString(created_at)}</p>
-                                    {is_edited && <p>• Edited</p>}
+                                    {is_edited && (
+                                        <div className='grid grid-cols-2'>
+                                            <p>•</p>
+                                            <img src={edited} width={20}/>
+                                        </div>
+                                    )}
                                 </div>
                             </Card.Description>
                             <div>
