@@ -1,6 +1,7 @@
 import { Modal, Button, Form, Input, Label } from "@heroui/react"
 import { useState } from "react"
 import { api } from '../App';
+import welcomeBack from '../assets/welcome-back.jpg';
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -43,6 +44,7 @@ function LoginModal({ isOpen, setIsOpen }: LoginModalProps) {
                     <Modal.Dialog>
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
+                            <img src={welcomeBack}></img>
                             <Modal.Heading className="text-2xl">Log in to your account</Modal.Heading>
                             {error && <p className="text-lg text-red-500">{error}</p>}
                         </Modal.Header>

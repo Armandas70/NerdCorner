@@ -7,6 +7,7 @@ import GameHeader from '../components/GameHeader';
 import PostCard from '../components/PostCard';
 import SideBar from '../components/SideBar';
 import PostAddModal from '../components/PostAddModal';
+import Footer from '../components/Footer';
 
 interface Game {
     id: number;
@@ -79,7 +80,7 @@ function GamePage() {
 
                     <div className="grid justify-center grid-cols-1">
                         {posts.filter(p => gameId ? p.game_id === parseInt(gameId) : p).map((post) => (
-                            <div className='flex mb-3 justify-center' onClick={() => navigate(`/games/${gameId}/posts/${post.id}`)}>
+                            <div key={post.id} className='flex mb-3 justify-center' onClick={() => navigate(`/games/${gameId}/posts/${post.id}`)}>
                                 <PostCard key={post.id} title={post.title} description={post.description}
                                     created_at={post.created_at} is_edited={post.is_edited} creator_id={post.creator_id}>
                                 </PostCard>
@@ -98,6 +99,7 @@ function GamePage() {
                 </PostAddModal>
             )}
 
+            <Footer></Footer>
         </div>
     )
 }

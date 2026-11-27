@@ -1,13 +1,15 @@
-// import { useState } from 'react';
 import { Link, SearchField, Input } from "@heroui/react"
 import UserMenu from './UserMenu';
+import Dates from "./Dates";
 
 interface HomeHeaderProps {
     filterText: string;
     setFilterText: React.Dispatch<React.SetStateAction<string>>;
+    filterDate: string;
+    setFilterDate: React.Dispatch<React.SetStateAction<string>>;
 }
 
-export default function HomeHeader({ filterText, setFilterText }: HomeHeaderProps) {
+export default function HomeHeader({ filterText, setFilterText, filterDate, setFilterDate }: HomeHeaderProps) {
     //className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground
 
     return (
@@ -26,6 +28,9 @@ export default function HomeHeader({ filterText, setFilterText }: HomeHeaderProp
                                 value={filterText}
                                 onChange={(e) => setFilterText(e.target.value)}
                             />
+                        </div>
+                        <div >
+                            <Dates date={filterDate} setDate={setFilterDate}></Dates>
                         </div>
                     </div>
                     <UserMenu></UserMenu>

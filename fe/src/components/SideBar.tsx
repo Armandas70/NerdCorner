@@ -40,7 +40,7 @@ function SideBar() {
                 </Card.Header>
                 <Card.Content>
                     {games.map((game) => (
-                        <div>
+                        <div key={game.id}>
                             <Link
                                 key={game.id}
                                 href={`/games/${game.id}`}

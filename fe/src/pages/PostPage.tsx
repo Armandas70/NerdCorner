@@ -8,6 +8,7 @@ import CommentCard from '../components/CommentCard';
 import PostDetailsCard from '../components/PostDetailsCard';
 import SideBar from '../components/SideBar';
 import CommentAddModal from '../components/CommentAddModal';
+import Footer from '../components/Footer';
 
 interface Game {
     id: number;
@@ -105,7 +106,7 @@ function PostPage() {
 
                     <div className="grid justify-center grid-cols-1">
                         {comments.map((comment) => (
-                            <div className='flex mb-3 justify-center'>
+                            <div key={comment.id} className='flex mb-3 justify-center'>
                                 <CommentCard key={comment.id} id={comment.id} content={comment.content} created_at={comment.created_at}
                                     is_edited={comment.is_edited} creator_id={comment.creator_id}>
                                 </CommentCard>
@@ -124,6 +125,7 @@ function PostPage() {
                 </CommentAddModal>
             )}
 
+            <Footer></Footer>
         </div>
     )
 }
