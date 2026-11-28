@@ -12,7 +12,7 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
     - Žaidimų katalogą
     - Įrašus
     - Komentarus
-4.	Užsiregistruoti prie sistemos
+2.	Užsiregistruoti prie sistemos
 
 ### Prisiregistravusio naudotojo galimybės:
 1.	Prisijungti prie sistemos
@@ -21,13 +21,13 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
     - Žaidimų katalogą
     - Įrašus
     - Komentarus
-5.	Sukurti:
+4.	Sukurti:
     - Įrašą
     - Komentarą
-7.	Redaguoti savo:
+5.	Redaguoti savo:
     - Įrašą
     - Komentarą
-9.	Ištrinti savo:
+6.	Ištrinti savo:
     - Įrašą
     - Komentarą
 
@@ -38,9 +38,18 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
     - Žaidimų katalogą
     - Įrašus
     - Komentarus
-5.	Sukurti žaidimą
-6.	Redaguoti žaidimą
-7.	Ištrinti žaidimą
+4.	Sukurti
+    - Žaidimą
+    - Įrašą
+    - Komentarą
+5.	Redaguoti savo
+    - Žaidimą
+    - Įrašą
+    - Komentarą
+6.	Ištrinti
+    - Žaidimus
+    - Įrašus
+    - Komentarus
 
 
 ## 1.3. Technologijų aprašymas
@@ -49,5 +58,3 @@ Sistema yra paremta internetinės diskusijų (angl. forum) svetainės pagrindu. 
 •	Kliento pusė (angl. frontend) – naudoja React.js karkasą  
 •	Serverio pusė (angl. backend) – naudoja Express.js karkasą  
 •	Duomenų bazė – naudoja PostgreSQL
-
-
