@@ -71,16 +71,20 @@ function HomePage() {
           <SideBar></SideBar>
         </aside>
 
-        <div className="grid grid-cols-1 justify-center flex-1 min-w-0">
-          {games.map((game) => (
-            <div key={game.id} className='flex mb-3 justify-center hover:animate-pulse' onClick={() => navigate(`/games/${game.id}`)}>
-              <GameCard key={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameCard>
-            </div>
-          ))}
+        <div className="flex-1 min-w-0">
+          <div className="grid grid-cols-1 justify-center">
+            {games.map((game) => (
+              <div key={game.id} className='flex mb-3 justify-center hover:animate-pulse' onClick={() => navigate(`/games/${game.id}`)}>
+                <GameCard key={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameCard>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center w-full mt-2">
+            <Pages page={page} setPage={setPage} totalPages={totalPages}></Pages>
+          </div>
         </div>
       </div>
-
-      <Pages page={page} setPage={setPage} totalPages={totalPages}></Pages>
       <Footer></Footer>
     </div>
   )
