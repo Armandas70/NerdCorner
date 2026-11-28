@@ -66,13 +66,13 @@ function GamePage() {
                 )}
             </div>
 
-            <div className="flex flex-col md:flex-row gap-6 lg:gap-12 xl:gap-40 px-4 md:px-0">
+            <div className="flex flex-col gap-6 px-4 md:px-0 md:grid md:grid-cols-[20rem_minmax(0,1fr)] md:gap-8 xl:gap-12 2xl:grid-cols-[20rem_minmax(0,1fr)_20rem]">
                 <aside className="hidden md:block md:min-w-xs min-h-5xl float-left sticky">
                     <SideBar></SideBar>
                 </aside>
 
                 <div className="grid flex-1 min-w-0 content-start">
-                    <div className="mb-3">
+                    <div className="mb-3 w-full max-w-5xl mx-auto">
                         <Button size='lg' onClick={() => setIsPostAddModalShown(true)}>
                             + Create post
                         </Button>
