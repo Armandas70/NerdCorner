@@ -55,7 +55,7 @@ function HomePage() {
   }, [filterText, filterDate, page]);
 
   return (
-    <div>
+    <div className="pb-14">
       <div className='mb-5'>
         <HomeHeader 
           filterText={filterText} 
@@ -66,12 +66,12 @@ function HomePage() {
       </HomeHeader>
       </div>
 
-      <div className="flex flex-row gap-40">
-        <aside className="block min-w-xs min-h-5xl float-left sticky">
+      <div className="flex flex-col md:flex-row gap-6 lg:gap-12 xl:gap-40 px-4 md:px-0">
+        <aside className="hidden md:block md:min-w-xs min-h-5xl float-left sticky">
           <SideBar></SideBar>
         </aside>
 
-        <div className="grid grid-cols-1 justify-center">
+        <div className="grid grid-cols-1 justify-center flex-1 min-w-0">
           {games.map((game) => (
             <div key={game.id} className='flex mb-3 justify-center hover:animate-pulse' onClick={() => navigate(`/games/${game.id}`)}>
               <GameCard key={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameCard>

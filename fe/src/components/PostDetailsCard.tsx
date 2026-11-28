@@ -42,16 +42,16 @@ function PostDetailsCard({
     }, []);
 
     return (
-        <div>
+        <div className="w-full flex justify-center">
             <Card className="max-w-5xl w-full border-1 border-solid border-secondary">
                 <Card.Header>
-                    <div className="grid grid-cols-12">
-                        <div className="flex col-span-10 grid grid-rows-3 gap-0">
-                            <div className="flex flex-row items-left justify-left w-1/2 gap-x-2">
+                    <div className="flex flex-col gap-3 sm:grid sm:grid-cols-12 w-full">
+                        <div className="flex sm:col-span-10 grid grid-rows-3 gap-0 min-w-0">
+                            <div className="flex flex-row items-left justify-left gap-x-2">
                                 <Card.Title className="text-xl text-primary font-bold">• {username}</Card.Title>
                             </div>
                             <Card.Description className="text-xl text-primary">
-                                <div className="flex gap-2 items-left justify-left">
+                                <div className="flex flex-wrap gap-2 items-left justify-left">
                                     <p>Created at: {dateToString(created_at)}</p>
                                     {is_edited && (
                                         <div className='grid grid-cols-2'>
@@ -62,12 +62,12 @@ function PostDetailsCard({
                                 </div>
                             </Card.Description>
                             <div>
-                                <h1 className="text-3xl font-bold">{title}</h1>
+                                <h1 className="text-2xl md:text-3xl font-bold break-words">{title}</h1>
                             </div>
                         </div>
 
-                        <div className="flex col-span-2">
-                            <Card.Title className='flex items-right justify-right mb-3'>
+                        <div className="flex sm:col-span-2 sm:justify-end">
+                            <Card.Title className='flex items-right justify-right sm:mb-3'>
                                 <div className="flex gap-2">
                                     <Button
                                         size="lg"
@@ -88,7 +88,7 @@ function PostDetailsCard({
                     </div>
                 </Card.Header>
                 <Card.Content>
-                    <div className="min-w-xl max-w-5xl text-xl">
+                    <div className="max-w-5xl text-xl break-words">
                         <p>{description}</p>
                     </div>
                 </Card.Content>

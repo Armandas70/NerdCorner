@@ -36,16 +36,16 @@ function CommentCard({ id, content, created_at, is_edited, creator_id }: Comment
     }, []);
 
     return (
-        <div>
-            <Card className="w-5xl" variant="default">
+        <div className="w-full flex justify-center">
+            <Card className="w-full max-w-5xl" variant="default">
                 <Card.Header>
-                    <div className="grid grid-cols-12">
-                        <div className="flex col-span-10 grid grid-rows-1 gap-0">
-                            <div className="flex flex-row items-left justify-left w-1/2 gap-x-2">
+                    <div className="flex flex-col gap-3 sm:grid sm:grid-cols-12 w-full">
+                        <div className="flex sm:col-span-10 grid grid-rows-1 gap-0 min-w-0">
+                            <div className="flex flex-row items-left justify-left gap-x-2">
                                 <Card.Title className="text-xl text-primary font-bold">• {username}</Card.Title>
                             </div>
                             <Card.Description className="text-xl text-primary">
-                                <div className="flex gap-2 items-left justify-left">
+                                <div className="flex flex-wrap gap-2 items-left justify-left">
                                     <p>Created at: {dateToString(created_at)}</p>
                                     {is_edited && (
                                         <div className='grid grid-cols-2'>
@@ -57,8 +57,8 @@ function CommentCard({ id, content, created_at, is_edited, creator_id }: Comment
                             </Card.Description>
                         </div>
 
-                        <div className="flex col-span-2">
-                            <Card.Title className='flex items-right justify-right mb-3'>
+                        <div className="flex sm:col-span-2 sm:justify-end">
+                            <Card.Title className='flex items-right justify-right sm:mb-3'>
                                 <div className="flex gap-2">
                                     <Button
                                         size="lg"
@@ -79,7 +79,7 @@ function CommentCard({ id, content, created_at, is_edited, creator_id }: Comment
                     </div>
                 </Card.Header>
                 <Card.Content>
-                    <p className="text-xl">{content}</p>
+                    <p className="text-xl break-words">{content}</p>
                 </Card.Content>
             </Card>
 

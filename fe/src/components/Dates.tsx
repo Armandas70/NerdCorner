@@ -18,7 +18,7 @@ export default function Dates({ date, setDate }: DatesProps) {
   }
 
   return (
-    <DatePicker className="w-72" name="date" onChange={(date) => setDateAsString(date)}>
+    <DatePicker className="w-full md:w-72" name="date" onChange={(date) => setDateAsString(date)}>
       {/* <Label>Date</Label> */}
       <DateField.Group fullWidth>
         <DateField.Input className="text-lg">{(segment) => <DateField.Segment segment={segment} />}</DateField.Input>
