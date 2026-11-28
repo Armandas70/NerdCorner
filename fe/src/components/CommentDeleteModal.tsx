@@ -33,7 +33,7 @@ function CommentDeleteModal({ isOpen, setIsOpen, id }: CommentDeleteModalProps) 
     return (
         <Modal isOpen={isOpen} onOpenChange={() => setIsOpen(isOpen)}>
             <Modal.Backdrop>
-                <Modal.Container placement="center" size='lg'>
+                <Modal.Container placement="center" size="lg" scroll="outside">
                     <Modal.Dialog>
                         <Modal.CloseTrigger onClick={() => setIsOpen(false)} />
                         <Modal.Header className="flex flex-col gap-1 mb-5">
