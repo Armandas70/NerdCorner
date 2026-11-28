@@ -20,27 +20,30 @@ function GameHeader({ id, title, description, created_at }: GameProps) {
 
     return (
         <div className="bg-secondary text-mist-50 py-6 shadow-md">
-            <div className="max-w-7xl px-4 md:ml-8 lg:ml-80 min-w-0 break-words">
-                <h1 className="text-2xl md:text-4xl font-bold tracking-tight">{title}</h1>
-                <span className="inline-block mt-1 text-sm md:text-base opacity-80">Created {dateToString(created_at)}</span>
-                <p className="text-lg md:text-xl mt-3 max-w-3xl opacity-95">{description}</p>
-
-                <div className="flex flex-wrap gap-2 mt-5 pt-4 border-t border-white/25">
-                    <Button
-                        variant="secondary"
-                        size="md"
-                        onClick={() => setIsGameEditModalShown(true)}
-                    >
-                        Edit
-                    </Button>
-                    <Button
-                        variant="danger-soft"
-                        size="md"
-                        onClick={() => setIsGameDeleteModalShown(true)}
-                    >
-                        Delete
-                    </Button>
+            <div className="px-4 md:pr-6 md:ml-8 lg:ml-80 min-w-0">
+                <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+                    <h1 className="text-2xl md:text-4xl font-bold tracking-tight break-words min-w-0">{title}</h1>
+                    <div className="flex gap-2 shrink-0">
+                        <Button
+                            variant="primary"
+                            size="md"
+                            className="bg-background text-primary font-semibold hover:bg-background/85"
+                            onClick={() => setIsGameEditModalShown(true)}
+                        >
+                            Edit
+                        </Button>
+                        <Button
+                            variant="danger"
+                            size="md"
+                            className="font-semibold ring-2 ring-white/70"
+                            onClick={() => setIsGameDeleteModalShown(true)}
+                        >
+                            Delete
+                        </Button>
+                    </div>
                 </div>
+                <span className="inline-block mt-1 text-sm md:text-base opacity-80">Created {dateToString(created_at)}</span>
+                <p className="text-lg md:text-xl mt-3 max-w-3xl break-words opacity-95">{description}</p>
             </div>
             {isGameEditModalShown && (
                 <GameEditModal 
