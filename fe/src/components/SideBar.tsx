@@ -23,12 +23,12 @@ function SideBar() {
     }, []);
 
     return (
-        <div className="ml-1 space-y-4">
-            <Card className="max-w-xs h-5xl border-1 border-solid border-secondary">
+        <div className="md:ml-1 space-y-4">
+            <Card className="w-full md:max-w-xs h-5xl border-1 border-solid border-secondary">
                 <Card.Header className="ml-2">
-                    <div className="grid grid-cols-8">
-                        <Card.Title className="text-2xl text-primary col-span-6">Games</Card.Title>
-                        <div className="col-span-2">
+                    <div className="flex items-center justify-between gap-2">
+                        <Card.Title className="text-2xl text-primary">Games</Card.Title>
+                        <div>
                             <Button
                                 size='md'
                                 onClick={() => setIsGameAddModalShown(true)}

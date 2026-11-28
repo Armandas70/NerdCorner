@@ -19,14 +19,14 @@ function GameHeader({ id, title, description, created_at }: GameProps) {
     const [isGameDeleteModalShown, setIsGameDeleteModalShown] = useState(false);
 
     return (
-        <div className="bg-secondary text-mist-50 grid grid-cols-10">
-            <div className="flex-1 max-w-7xl mx-auto px-4 mt-4 ml-80 col-span-8">
-                <h1 className="text-3xl font-bold">{title}</h1>
+        <div className="bg-secondary text-mist-50 flex flex-col gap-3 pb-3 md:pb-0 md:grid md:grid-cols-10">
+            <div className="flex-1 max-w-7xl mx-auto px-4 mt-4 md:ml-8 lg:ml-80 md:col-span-8 min-w-0 break-words">
+                <h1 className="text-2xl md:text-3xl font-bold">{title}</h1>
                 <span className="text-lg">• Created {dateToString(created_at)}</span>
                 <p className="text-xl mt-1">{description}</p>
             </div>
 
-            <div className="flex gap-2 col-span-2">
+            <div className="flex gap-2 px-4 md:px-0 md:col-span-2 md:items-start md:mt-4">
                 <Button
                     variant='secondary'
                     size="lg"

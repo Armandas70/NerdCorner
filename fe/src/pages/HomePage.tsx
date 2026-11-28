@@ -55,7 +55,7 @@ function HomePage() {
   }, [filterText, filterDate, page]);
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       <div className='mb-5'>
         <HomeHeader 
           filterText={filterText} 
@@ -66,21 +66,25 @@ function HomePage() {
       </HomeHeader>
       </div>
 
-      <div className="flex flex-row gap-40">
-        <aside className="block min-w-xs min-h-5xl float-left sticky">
+      <div className="flex flex-col gap-6 px-4 md:px-0 md:grid md:grid-cols-[20rem_minmax(0,1fr)] md:gap-8 xl:gap-12 2xl:grid-cols-[20rem_minmax(0,1fr)_20rem]">
+        <aside className="hidden md:block md:min-w-xs min-h-5xl float-left sticky">
           <SideBar></SideBar>
         </aside>
 
-        <div className="grid grid-cols-1 justify-center">
-          {games.map((game) => (
-            <div key={game.id} className='flex mb-3 justify-center hover:animate-pulse' onClick={() => navigate(`/games/${game.id}`)}>
-              <GameCard key={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameCard>
-            </div>
-          ))}
+        <div className="flex-1 min-w-0">
+          <div className="grid grid-cols-1 justify-center">
+            {games.map((game) => (
+              <div key={game.id} className='flex mb-3 justify-center hover:animate-pulse' onClick={() => navigate(`/games/${game.id}`)}>
+                <GameCard key={game.id} title={game.title} description={game.description} created_at={game.created_at}></GameCard>
+              </div>
+            ))}
+          </div>
+
+          <div className="flex justify-center w-full mt-2">
+            <Pages page={page} setPage={setPage} totalPages={totalPages}></Pages>
+          </div>
         </div>
       </div>
-
-      <Pages page={page} setPage={setPage} totalPages={totalPages}></Pages>
       <Footer></Footer>
     </div>
   )

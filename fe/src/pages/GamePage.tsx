@@ -58,7 +58,7 @@ function GamePage() {
     }, []);
 
     return (
-        <div>
+        <div className="min-h-screen flex flex-col">
             <div className='mb-5'>
                 <Header></Header>
                 {game && (
@@ -66,13 +66,13 @@ function GamePage() {
                 )}
             </div>
 
-            <div className="flex flex-row gap-40">
-                <aside className="block min-w-xs min-h-5xl float-left sticky">
+            <div className="flex flex-col gap-6 px-4 md:px-0 md:grid md:grid-cols-[20rem_minmax(0,1fr)] md:gap-8 xl:gap-12 2xl:grid-cols-[20rem_minmax(0,1fr)_20rem]">
+                <aside className="hidden md:block md:min-w-xs min-h-5xl float-left sticky">
                     <SideBar></SideBar>
                 </aside>
 
-                <div className="grid">
-                    <div className="mb-3">
+                <div className="grid flex-1 min-w-0 content-start">
+                    <div className="mb-3 w-full max-w-5xl mx-auto">
                         <Button size='lg' onClick={() => setIsPostAddModalShown(true)}>
                             + Create post
                         </Button>

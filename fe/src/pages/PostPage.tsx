@@ -71,7 +71,7 @@ function PostPage() {
     }, []);
 
     return (
-        <div>
+        <div className="min-h-screen flex flex-col">
             <div className='mb-5'>
                 <Header></Header>
                 {game && (
@@ -79,12 +79,12 @@ function PostPage() {
                 )}
             </div>
 
-            <div className="flex flex-row gap-40">
-                <aside className="block min-w-xs min-h-5xl float-left sticky">
+            <div className="flex flex-col gap-6 px-4 md:px-0 md:grid md:grid-cols-[20rem_minmax(0,1fr)] md:gap-8 xl:gap-12 2xl:grid-cols-[20rem_minmax(0,1fr)_20rem]">
+                <aside className="hidden md:block md:min-w-xs min-h-5xl float-left sticky">
                     <SideBar ></SideBar>
                 </aside>
 
-                <div>
+                <div className="flex-1 min-w-0">
                     <div className='flex justify-center mb-5'>
                         {post && (
                             <PostDetailsCard id={post.id} title={post.title} description={post.description} 
@@ -93,11 +93,11 @@ function PostPage() {
                         )}
                     </div>
 
-                    <div className="grid grid-cols-13 mb-2">
-                        <div className='flex mb-2 text-lg text-primary font-bold col-span-11'>
+                    <div className="flex items-center justify-between gap-2 mb-2 w-full max-w-5xl mx-auto">
+                        <div className='flex text-lg text-primary font-bold'>
                             Comments: {commentsCount}
                         </div>
-                        <div className="col-span-2">
+                        <div>
                             <Button size='lg' onClick={() => setIsCommentAddModalShown(true)}>
                                 + Add comment
                             </Button>

@@ -11,12 +11,12 @@ export default function Pages({ page, setPage, totalPages }: PagesProps) {
   //const totalPages = 3;
 
   return (
-    <Pagination className="justify-center" size="lg">
-      <Pagination.Content>
+    <Pagination className="justify-center px-2" size="lg">
+      <Pagination.Content className="flex-wrap justify-center">
         <Pagination.Item>
           <Pagination.Previous isDisabled={page === 1 ? true : false} onPress={() => setPage((p) => p - 1)}>
             <Pagination.PreviousIcon />
-            <span>Previous</span>
+            <span className="hidden sm:inline">Previous</span>
           </Pagination.Previous>
         </Pagination.Item>
         {Array.from({length: totalPages}, (_, i) => i + 1).map((p) => (
@@ -28,7 +28,7 @@ export default function Pages({ page, setPage, totalPages }: PagesProps) {
         ))}
         <Pagination.Item>
           <Pagination.Next isDisabled={page === totalPages ? true : false} onPress={() => setPage((p) => p + 1)}>
-            <span>Next</span>
+            <span className="hidden sm:inline">Next</span>
             <Pagination.NextIcon />
           </Pagination.Next>
         </Pagination.Item>
