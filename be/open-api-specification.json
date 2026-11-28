@@ -1,0 +1,3690 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "NerdCorner API",
+    "version": "1.0.0",
+    "description": "REST API for **NerdCorner**, a forum where users discuss games.\n\nA *game* has many *posts*, and a *post* has many *comments*.\n\n**Authentication:** log in via `POST /auth/login` (or register). The server sets an HttpOnly `access_token` cookie (valid 5 minutes) that must be sent with protected requests (`credentials: 'include'` in browsers); renew it with `POST /auth/refresh`.\n\n**Roles:** anonymous users can read; logged-in users can create posts/comments and edit/delete their own; administrators can manage games and users and delete any post or comment.\n\n**Conventions:** list endpoints are paginated with `?page=`. Successful create/update/delete calls return an empty JSON array `[]`. Errors are always `{ \"message\": \"...\" }`. Every operation includes request examples and example responses for each possible result."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "General",
+      "description": "Service health/welcome."
+    },
+    {
+      "name": "Authentication",
+      "description": "Register, log in/out and refresh tokens."
+    },
+    {
+      "name": "Games",
+      "description": "Games (admin-managed) and their posts."
+    },
+    {
+      "name": "Posts",
+      "description": "Posts inside a game (create/edit/delete need a login)."
+    },
+    {
+      "name": "Comments",
+      "description": "Comments on posts (create/edit/delete need a login)."
+    },
+    {
+      "name": "Users",
+      "description": "User management (mostly admin only)."
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "register",
+        "summary": "Register a new user",
+        "description": "Creates a new (non-admin) account, logs the user in and sets `access_token` (5 min JWT) and `refresh_token` (1 day JWT) cookies.",
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              },
+              "examples": {
+                "validUser": {
+                  "summary": "A new user",
+                  "value": {
+                    "username": "nerdy_nora",
+                    "email": "nora@example.com",
+                    "password": "S3cretPass!"
+                  }
+                },
+                "missingPassword": {
+                  "summary": "Missing password (400)",
+                  "value": {
+                    "username": "nerdy_nora",
+                    "email": "nora@example.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered and logged in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegisterResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "message": "User registered successfully",
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5vcmFAZXhhbXBsZS5jb20ifQ.sig"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "`access_token` and `refresh_token` cookies (HttpOnly, Secure, SameSite=Lax, 1 day).",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "access_token=eyJhbGciOiJIUzI1NiJ9...; Path=/; HttpOnly; Secure; SameSite=Lax"
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error, email already used, or a database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: username, email, password"
+                    }
+                  },
+                  "email_taken": {
+                    "summary": "Email already registered",
+                    "value": {
+                      "message": "Account with this email already exists"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "login",
+        "summary": "Log in",
+        "description": "Checks the credentials and sets `access_token` and `refresh_token` cookies. The access token is also returned in the body.",
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              },
+              "examples": {
+                "validLogin": {
+                  "summary": "Valid credentials",
+                  "value": {
+                    "email": "nora@example.com",
+                    "password": "S3cretPass!"
+                  }
+                },
+                "missingEmail": {
+                  "summary": "Missing email (400)",
+                  "value": {
+                    "password": "S3cretPass!"
+                  }
+                },
+                "wrongPassword": {
+                  "summary": "Wrong password (401)",
+                  "value": {
+                    "email": "nora@example.com",
+                    "password": "wrong"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "message": "User logged in successfully",
+                      "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5vcmFAZXhhbXBsZS5jb20ifQ.sig"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Set-Cookie": {
+                "description": "`access_token` and `refresh_token` cookies (HttpOnly, Secure, SameSite=Lax, 1 day).",
+                "schema": {
+                  "type": "string"
+                },
+                "example": "access_token=eyJhbGciOiJIUzI1NiJ9...; Path=/; HttpOnly; Secure; SameSite=Lax"
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: email, password"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unknown email or wrong password.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "incorrect_credentials": {
+                    "summary": "Incorrect credentials",
+                    "value": {
+                      "message": "Incorrect email or password"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "logout",
+        "summary": "Log out",
+        "description": "Deletes the stored refresh token (if the `refresh_token` cookie is present) and clears both cookies. Works even when not logged in.",
+        "responses": {
+          "200": {
+            "description": "Logged out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "message": "User logged out successfully"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          }
+        },
+        "security": []
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "operationId": "refreshToken",
+        "summary": "Get a new access token",
+        "description": "Uses the `refresh_token` cookie (and the email stored in the existing `access_token` cookie) to issue a new 5 minute access token.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New access token issued (also set as `access_token` cookie).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RefreshResponse"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im5vcmFAZXhhbXBsZS5jb20ifQ.newsig"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "`refresh_token` cookie missing, invalid or expired.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "unauthorized": {
+                    "summary": "Unauthorized",
+                    "value": {
+                      "message": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "406": {
+            "description": "The refresh token is not the one stored for this user (e.g. after logout).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_refresh": {
+                    "summary": "Invalid refresh",
+                    "value": {
+                      "message": "Forbidden: Invalid refresh token"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "listGames",
+        "summary": "List games",
+        "description": "Returns a paginated list (5 per page). Supports filtering.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number, starting from 1.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "description": "Returns only items whose title contains this text.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Witcher"
+          },
+          {
+            "name": "created_at",
+            "in": "query",
+            "required": false,
+            "description": "Returns only items created on or after this date (`YYYY-MM-DD`).",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-11-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of results. `links.previous` is an empty string on the first page; `links.next` is always present (the next page may be empty).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GamePage"
+                },
+                "examples": {
+                  "firstPage": {
+                    "summary": "First page",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "title": "The Witcher 3",
+                          "description": "Open-world RPG by CD Projekt Red",
+                          "created_at": "2026-11-20T00:00:00.000Z"
+                        },
+                        {
+                          "id": 2,
+                          "title": "Elden Ring",
+                          "description": "Action RPG by FromSoftware",
+                          "created_at": "2026-11-22T00:00:00.000Z"
+                        }
+                      ],
+                      "links": {
+                        "previous": "",
+                        "next": "http://localhost:3000/games?page=2"
+                      }
+                    }
+                  },
+                  "emptyPage": {
+                    "summary": "A page past the last result",
+                    "value": {
+                      "data": [],
+                      "links": {
+                        "previous": "http://localhost:3000/games?page=3",
+                        "next": "http://localhost:3000/games?page=5"
+                      }
+                    }
+                  },
+                  "filtered": {
+                    "summary": "Filtered by title (`?title=Witcher`)",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 1,
+                          "title": "The Witcher 3",
+                          "description": "Open-world RPG by CD Projekt Red",
+                          "created_at": "2026-11-20T00:00:00.000Z"
+                        }
+                      ],
+                      "links": {
+                        "previous": "",
+                        "next": "http://localhost:3000/games?page=2&title=Witcher"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid page number or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_page": {
+                    "summary": "`page` is not a number",
+                    "value": {
+                      "message": "Invalid page number"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "createGame",
+        "summary": "Create a game (admin)",
+        "description": "Requires an administrator. Game titles must be unique. The created row is not returned - on success the body is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameInput"
+              },
+              "examples": {
+                "validGame": {
+                  "summary": "A new game",
+                  "value": {
+                    "title": "Hades",
+                    "description": "Roguelike dungeon crawler by Supergiant Games"
+                  }
+                },
+                "emptyTitle": {
+                  "summary": "Empty title (400)",
+                  "value": {
+                    "title": "",
+                    "description": "Roguelike dungeon crawler"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Game created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error, duplicate title, or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: title, description"
+                    }
+                  },
+                  "duplicate": {
+                    "summary": "Title already exists",
+                    "value": {
+                      "message": "Game with this title already exists"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid/expired token, or the user is not an administrator.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_admin": {
+                    "summary": "Not an administrator",
+                    "value": {
+                      "message": "Unauthorized: need to have admin privileges"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games/{id}": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "getGame",
+        "summary": "Get a game by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Game id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The game, plus links to update/delete it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GameSingle"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "id": 1,
+                        "title": "The Witcher 3",
+                        "description": "Open-world RPG by CD Projekt Red",
+                        "created_at": "2026-11-20T00:00:00.000Z"
+                      },
+                      "links": {
+                        "update": "http://localhost:3000/games/1",
+                        "delete": "http://localhost:3000/games/1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No game with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Game not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "patch": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "updateGame",
+        "summary": "Update a game (admin)",
+        "description": "Requires an administrator. Both `title` and `description` must be sent. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Game id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GameInput"
+              },
+              "examples": {
+                "validUpdate": {
+                  "summary": "New title and description",
+                  "value": {
+                    "title": "The Witcher 3: Wild Hunt",
+                    "description": "Award-winning open-world RPG"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Game updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id, validation error, or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: title, description"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid/expired token, or the user is not an administrator.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_admin": {
+                    "summary": "Not an administrator",
+                    "value": {
+                      "message": "Unauthorized: need to have admin privileges"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No game with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Game not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "deleteGame",
+        "summary": "Delete a game (admin)",
+        "description": "Requires an administrator. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Game id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Game deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error (e.g. the game still has posts).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid/expired token, or the user is not an administrator.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_admin": {
+                    "summary": "Not an administrator",
+                    "value": {
+                      "message": "Unauthorized: need to have admin privileges"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No game with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Game not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games/{gameId}/posts": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "listGamePosts",
+        "summary": "List all posts of a game",
+        "description": "Returns every post of the game (not paginated).",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "description": "Game id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posts of the game (may be empty).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostList"
+                },
+                "examples": {
+                  "withPosts": {
+                    "summary": "Game with posts",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 7,
+                          "title": "Best build for beginners?",
+                          "description": "Which skills should I level first?",
+                          "created_at": "2026-11-25T00:00:00.000Z",
+                          "is_edited": false,
+                          "creator_id": 3,
+                          "game_id": 1
+                        }
+                      ]
+                    }
+                  },
+                  "noPosts": {
+                    "summary": "Game without posts",
+                    "value": {
+                      "data": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid game id or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`gameId` is not a number",
+                    "value": {
+                      "message": "Invalid game id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No game with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Game not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/games/{gameId}/posts/{postId}/comments": {
+      "get": {
+        "tags": [
+          "Games"
+        ],
+        "operationId": "getGamePostComments",
+        "summary": "Get a post with its comments",
+        "description": "Returns the post (it must belong to the game), the number of comments and the comments themselves.",
+        "parameters": [
+          {
+            "name": "gameId",
+            "in": "path",
+            "required": true,
+            "description": "Game id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "description": "Post id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 7
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The post and its comments.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostWithComments"
+                },
+                "examples": {
+                  "withComments": {
+                    "summary": "Post with comments",
+                    "value": {
+                      "post": {
+                        "id": 7,
+                        "title": "Best build for beginners?",
+                        "description": "Which skills should I level first?",
+                        "created_at": "2026-11-25T00:00:00.000Z",
+                        "is_edited": false,
+                        "creator_id": 3,
+                        "game_id": 1
+                      },
+                      "commentsCount": 1,
+                      "comments": [
+                        {
+                          "id": 12,
+                          "content": "Go with the Igni build, it's very forgiving.",
+                          "created_at": "2026-11-26T00:00:00.000Z",
+                          "is_edited": false,
+                          "creator_id": 4,
+                          "post_id": 7
+                        }
+                      ]
+                    }
+                  },
+                  "noComments": {
+                    "summary": "Post without comments",
+                    "value": {
+                      "post": {
+                        "id": 7,
+                        "title": "Best build for beginners?",
+                        "description": "Which skills should I level first?",
+                        "created_at": "2026-11-25T00:00:00.000Z",
+                        "is_edited": false,
+                        "creator_id": 3,
+                        "game_id": 1
+                      },
+                      "commentsCount": 0,
+                      "comments": []
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ids or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_game": {
+                    "summary": "`gameId` is not a number",
+                    "value": {
+                      "message": "Invalid game id"
+                    }
+                  },
+                  "invalid_post": {
+                    "summary": "`postId` is not a number",
+                    "value": {
+                      "message": "Invalid post id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Game not found, or the post does not exist in this game.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "game": {
+                    "summary": "Game not found",
+                    "value": {
+                      "message": "Game not found"
+                    }
+                  },
+                  "post": {
+                    "summary": "Post not found",
+                    "value": {
+                      "message": "Post not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    },
+    "/posts": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "operationId": "listPosts",
+        "summary": "List posts",
+        "description": "Returns a paginated list (5 per page). Supports filtering.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number, starting from 1.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "description": "Returns only items whose title contains this text.",
+            "schema": {
+              "type": "string"
+            },
+            "example": "Witcher"
+          },
+          {
+            "name": "created_at",
+            "in": "query",
+            "required": false,
+            "description": "Returns only items created on or after this date (`YYYY-MM-DD`).",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-11-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of results. `links.previous` is an empty string on the first page; `links.next` is always present (the next page may be empty).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostPage"
+                },
+                "examples": {
+                  "firstPage": {
+                    "summary": "First page",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 7,
+                          "title": "Best build for beginners?",
+                          "description": "Which skills should I level first?",
+                          "created_at": "2026-11-25T00:00:00.000Z",
+                          "is_edited": false,
+                          "creator_id": 3,
+                          "game_id": 1
+                        }
+                      ],
+                      "links": {
+                        "previous": "",
+                        "next": "http://localhost:3000/posts?page=2"
+                      }
+                    }
+                  },
+                  "emptyPage": {
+                    "summary": "A page past the last result",
+                    "value": {
+                      "data": [],
+                      "links": {
+                        "previous": "http://localhost:3000/posts?page=3",
+                        "next": "http://localhost:3000/posts?page=5"
+                      }
+                    }
+                  },
+                  "filtered": {
+                    "summary": "Filtered by title (`?title=Witcher`)",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 7,
+                          "title": "Best build for beginners?",
+                          "description": "Which skills should I level first?",
+                          "created_at": "2026-11-25T00:00:00.000Z",
+                          "is_edited": false,
+                          "creator_id": 3,
+                          "game_id": 1
+                        }
+                      ],
+                      "links": {
+                        "previous": "",
+                        "next": "http://localhost:3000/posts?page=2&title=Witcher"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid page number or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_page": {
+                    "summary": "`page` is not a number",
+                    "value": {
+                      "message": "Invalid page number"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "operationId": "createPost",
+        "summary": "Create a post",
+        "description": "Requires a logged-in user; the post's creator is the current user. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostCreateInput"
+              },
+              "examples": {
+                "validPost": {
+                  "summary": "A new post",
+                  "value": {
+                    "title": "Best build for beginners?",
+                    "description": "Which skills should I level first?",
+                    "gameId": 1
+                  }
+                },
+                "missingDescription": {
+                  "summary": "Missing description (400)",
+                  "value": {
+                    "title": "Best build for beginners?",
+                    "gameId": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or database error (e.g. invalid `gameId`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: title, description"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenToken"
+          },
+          "404": {
+            "description": "The game with `gameId` does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "game_not_found": {
+                    "summary": "Game not found",
+                    "value": {
+                      "message": "Game not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/{id}": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "operationId": "getPost",
+        "summary": "Get a post by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Post id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 7
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The post, plus links to update/delete it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostSingle"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "id": 7,
+                        "title": "Best build for beginners?",
+                        "description": "Which skills should I level first?",
+                        "created_at": "2026-11-25T00:00:00.000Z",
+                        "is_edited": false,
+                        "creator_id": 3,
+                        "game_id": 1
+                      },
+                      "links": {
+                        "update": "http://localhost:3000/posts/7",
+                        "delete": "http://localhost:3000/posts/7"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No post with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Post not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "patch": {
+        "tags": [
+          "Posts"
+        ],
+        "operationId": "updatePost",
+        "summary": "Update a post (owner only)",
+        "description": "Only the post's creator may edit it. Sets `is_edited` to true. Both fields must be sent. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Post id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 7
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PostUpdateInput"
+              },
+              "examples": {
+                "validUpdate": {
+                  "summary": "New title and description",
+                  "value": {
+                    "title": "Best build for beginners? (solved)",
+                    "description": "Thanks, Igni build works great."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id, validation error, or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: title, description"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid token, or the user is not the post's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_owner": {
+                    "summary": "Not the owner",
+                    "value": {
+                      "message": "Unauthorized: not owner of this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No post with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Post not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Posts"
+        ],
+        "operationId": "deletePost",
+        "summary": "Delete a post (owner or admin)",
+        "description": "Allowed for the post's creator or an administrator. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Post id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 7
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error (e.g. the post still has comments).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid token, or the user is neither the owner nor an admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_owner": {
+                    "summary": "Not the owner",
+                    "value": {
+                      "message": "Unauthorized: not owner of this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No post with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Post not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "listComments",
+        "summary": "List comments",
+        "description": "Returns a paginated list (5 per page). Supports filtering.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number, starting from 1.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "example": 1
+          },
+          {
+            "name": "created_at",
+            "in": "query",
+            "required": false,
+            "description": "Returns only items created on or after this date (`YYYY-MM-DD`).",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "example": "2026-11-01"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of results. `links.previous` is an empty string on the first page; `links.next` is always present (the next page may be empty).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentPage"
+                },
+                "examples": {
+                  "firstPage": {
+                    "summary": "First page",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 12,
+                          "content": "Go with the Igni build, it's very forgiving.",
+                          "created_at": "2026-11-26T00:00:00.000Z",
+                          "is_edited": false,
+                          "creator_id": 4,
+                          "post_id": 7
+                        }
+                      ],
+                      "links": {
+                        "previous": "",
+                        "next": "http://localhost:3000/comments?page=2"
+                      }
+                    }
+                  },
+                  "emptyPage": {
+                    "summary": "A page past the last result",
+                    "value": {
+                      "data": [],
+                      "links": {
+                        "previous": "http://localhost:3000/comments?page=3",
+                        "next": "http://localhost:3000/comments?page=5"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid page number or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_page": {
+                    "summary": "`page` is not a number",
+                    "value": {
+                      "message": "Invalid page number"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "createComment",
+        "summary": "Create a comment",
+        "description": "Requires a logged-in user; the comment's creator is the current user. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentCreateInput"
+              },
+              "examples": {
+                "validComment": {
+                  "summary": "A new comment",
+                  "value": {
+                    "content": "Go with the Igni build, it's very forgiving.",
+                    "postId": 7
+                  }
+                },
+                "emptyContent": {
+                  "summary": "Empty content (400)",
+                  "value": {
+                    "content": "",
+                    "postId": 7
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error or database error (e.g. invalid `postId`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "missing_fields": {
+                    "summary": "`content` is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: content"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/ForbiddenToken"
+          },
+          "404": {
+            "description": "The post with `postId` does not exist.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "post_not_found": {
+                    "summary": "Post not found",
+                    "value": {
+                      "message": "Post not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/comments/{id}": {
+      "get": {
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "getComment",
+        "summary": "Get a comment by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 12
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The comment, plus links to update/delete it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentSingle"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "id": 12,
+                        "content": "Go with the Igni build, it's very forgiving.",
+                        "created_at": "2026-11-26T00:00:00.000Z",
+                        "is_edited": false,
+                        "creator_id": 4,
+                        "post_id": 7
+                      },
+                      "links": {
+                        "update": "http://localhost:3000/comments/12",
+                        "delete": "http://localhost:3000/comments/12"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No comment with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Comment not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "patch": {
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "updateComment",
+        "summary": "Update a comment (owner only)",
+        "description": "Only the comment's creator may edit it. Sets `is_edited` to true. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 12
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentUpdateInput"
+              },
+              "examples": {
+                "validUpdate": {
+                  "summary": "New content",
+                  "value": {
+                    "content": "Go with the Igni build - very forgiving. Edit: also get Quen."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id, validation error, or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "missing_fields": {
+                    "summary": "`content` is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: content"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid token, or the user is not the comment's owner.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_owner": {
+                    "summary": "Not the owner",
+                    "value": {
+                      "message": "Unauthorized: not owner of this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No comment with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Comment not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Comments"
+        ],
+        "operationId": "deleteComment",
+        "summary": "Delete a comment (owner or admin)",
+        "description": "Allowed for the comment's creator or an administrator. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Comment id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 12
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid token, or the user is neither the owner nor an admin.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_owner": {
+                    "summary": "Not the owner",
+                    "value": {
+                      "message": "Unauthorized: not owner of this resource"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No comment with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "Comment not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "listUsers",
+        "summary": "List users",
+        "description": "Returns a paginated list (3 per page). Filtering is not supported.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "description": "Page number, starting from 1.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "default": 1
+            },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of results. `links.previous` is an empty string on the first page; `links.next` is always present (the next page may be empty).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPage"
+                },
+                "examples": {
+                  "firstPage": {
+                    "summary": "First page",
+                    "value": {
+                      "data": [
+                        {
+                          "id": 3,
+                          "username": "nerdy_nora",
+                          "email": "nora@example.com",
+                          "password": "$2b$10$wJ1c0uQ0nM8mXk3Gm0m7QeV6nq9s3oZtq2sYk0a1b2c3d4e5f6g7h",
+                          "is_admin": false
+                        }
+                      ],
+                      "links": {
+                        "previous": "",
+                        "next": "http://localhost:3000/users?page=2"
+                      }
+                    }
+                  },
+                  "emptyPage": {
+                    "summary": "A page past the last result",
+                    "value": {
+                      "data": [],
+                      "links": {
+                        "previous": "http://localhost:3000/users?page=3",
+                        "next": "http://localhost:3000/users?page=5"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid page number or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_page": {
+                    "summary": "`page` is not a number",
+                    "value": {
+                      "message": "Invalid page number"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "createUser",
+        "summary": "Create a user (admin)",
+        "description": "Requires an administrator. **Note:** the password property of this endpoint's body is literally named `\"password\"` (including the quotes), and the stored `username` is set to the given `email`. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateInput"
+              },
+              "examples": {
+                "validUser": {
+                  "summary": "A new user",
+                  "value": {
+                    "username": "nerdy_nora",
+                    "email": "nora@example.com",
+                    "\"password\"": "S3cretPass!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error, email already used, or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: username, email, password"
+                    }
+                  },
+                  "email_taken": {
+                    "summary": "Email already registered",
+                    "value": {
+                      "message": "Account with this email already exists"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid/expired token, or the user is not an administrator.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_admin": {
+                    "summary": "Not an administrator",
+                    "value": {
+                      "message": "Unauthorized: need to have admin privileges"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "getUser",
+        "summary": "Get a user by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user, plus links to update/delete it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSingle"
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": {
+                      "data": {
+                        "id": 3,
+                        "username": "nerdy_nora",
+                        "email": "nora@example.com",
+                        "password": "$2b$10$wJ1c0uQ0nM8mXk3Gm0m7QeV6nq9s3oZtq2sYk0a1b2c3d4e5f6g7h",
+                        "is_admin": false
+                      },
+                      "links": {
+                        "update": "http://localhost:3000/users/3",
+                        "delete": "http://localhost:3000/users/3"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "updateUser",
+        "summary": "Update a user (admin)",
+        "description": "Requires an administrator. Both `username` and `\"password\"` (literal quotes in the name) must be sent. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 3
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateInput"
+              },
+              "examples": {
+                "validUpdate": {
+                  "summary": "New username",
+                  "value": {
+                    "username": "nora_the_nerd",
+                    "\"password\"": "NewS3cret!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id, validation error, or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "missing_fields": {
+                    "summary": "A required field is missing or empty",
+                    "value": {
+                      "message": "None of these fields can be left empty: username, password"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid/expired token, or the user is not an administrator.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_admin": {
+                    "summary": "Not an administrator",
+                    "value": {
+                      "message": "Unauthorized: need to have admin privileges"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "operationId": "deleteUser",
+        "summary": "Delete a user (admin)",
+        "description": "Requires an administrator. Body on success is an empty array.",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "User id.",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "example": 3
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "maxItems": 0,
+                  "items": {}
+                },
+                "examples": {
+                  "success": {
+                    "summary": "Success",
+                    "value": []
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid id or database error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_id": {
+                    "summary": "`id` is not a number",
+                    "value": {
+                      "message": "Invalid id"
+                    }
+                  },
+                  "bad_request": {
+                    "summary": "Database error",
+                    "value": {
+                      "message": "Bad request"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "description": "Invalid/expired token, or the user is not an administrator.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "invalid_token": {
+                    "summary": "Invalid or expired access token",
+                    "value": {
+                      "message": "Forbidden: Invalid token"
+                    }
+                  },
+                  "not_admin": {
+                    "summary": "Not an administrator",
+                    "value": {
+                      "message": "Unauthorized: need to have admin privileges"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user with this id.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "examples": {
+                  "not_found": {
+                    "summary": "Not found",
+                    "value": {
+                      "message": "User not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": [
+          "General"
+        ],
+        "operationId": "welcome",
+        "summary": "Welcome message",
+        "responses": {
+          "200": {
+            "description": "Plain-text greeting.",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "welcome": {
+                    "summary": "Greeting",
+                    "value": "Welcome to NerdCorner!"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "access_token",
+        "description": "JWT access token set by `/auth/login` or `/auth/register`."
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Bad request"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "Message": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User logged out successfully"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "Game": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1,
+            "description": "Unique id."
+          },
+          "title": {
+            "type": "string",
+            "example": "The Witcher 3"
+          },
+          "description": {
+            "type": "string",
+            "example": "Open-world RPG by CD Projekt Red"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-20T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "created_at"
+        ]
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1,
+            "description": "Unique id."
+          },
+          "title": {
+            "type": "string",
+            "example": "Best build for beginners?"
+          },
+          "description": {
+            "type": "string",
+            "example": "Which skills should I level first?"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-20T00:00:00.000Z"
+          },
+          "is_edited": {
+            "type": "boolean",
+            "example": false
+          },
+          "creator_id": {
+            "type": "integer",
+            "example": 3,
+            "description": "Id of the user who created the post."
+          },
+          "game_id": {
+            "type": "integer",
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "description",
+          "created_at",
+          "is_edited",
+          "creator_id",
+          "game_id"
+        ]
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1,
+            "description": "Unique id."
+          },
+          "content": {
+            "type": "string",
+            "example": "Go with the Igni build, it's very forgiving."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-11-20T00:00:00.000Z"
+          },
+          "is_edited": {
+            "type": "boolean",
+            "example": false
+          },
+          "creator_id": {
+            "type": "integer",
+            "example": 4
+          },
+          "post_id": {
+            "type": "integer",
+            "example": 7
+          }
+        },
+        "required": [
+          "id",
+          "content",
+          "created_at",
+          "is_edited",
+          "creator_id",
+          "post_id"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1,
+            "description": "Unique id."
+          },
+          "username": {
+            "type": "string",
+            "example": "nerdy_nora"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "nora@example.com"
+          },
+          "password": {
+            "type": "string",
+            "example": "$2b$10$wJ1c0uQ0nM8mXk3Gm0m7QeV6nq9s3oZtq2sYk0a1b2c3d4e5f6g7h",
+            "description": "bcrypt hash of the password. Currently included in user responses."
+          },
+          "is_admin": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "email",
+          "is_admin"
+        ]
+      },
+      "GamePage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Game"
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "previous": {
+                "type": "string",
+                "example": "",
+                "description": "URL of the previous page, or an empty string on the first page."
+              },
+              "next": {
+                "type": "string",
+                "example": "http://localhost:3000/games?page=2"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "PostPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "previous": {
+                "type": "string",
+                "example": "",
+                "description": "URL of the previous page, or an empty string on the first page."
+              },
+              "next": {
+                "type": "string",
+                "example": "http://localhost:3000/games?page=2"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "CommentPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "previous": {
+                "type": "string",
+                "example": "",
+                "description": "URL of the previous page, or an empty string on the first page."
+              },
+              "next": {
+                "type": "string",
+                "example": "http://localhost:3000/games?page=2"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "UserPage": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "previous": {
+                "type": "string",
+                "example": "",
+                "description": "URL of the previous page, or an empty string on the first page."
+              },
+              "next": {
+                "type": "string",
+                "example": "http://localhost:3000/games?page=2"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "GameSingle": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Game"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "update": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              },
+              "delete": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "PostSingle": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Post"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "update": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              },
+              "delete": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "CommentSingle": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/Comment"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "update": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              },
+              "delete": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "UserSingle": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/User"
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "update": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              },
+              "delete": {
+                "type": "string",
+                "format": "uri",
+                "example": "http://localhost:3000/games/1"
+              }
+            }
+          }
+        },
+        "required": [
+          "data",
+          "links"
+        ]
+      },
+      "PostList": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "PostWithComments": {
+        "type": "object",
+        "properties": {
+          "post": {
+            "$ref": "#/components/schemas/Post"
+          },
+          "commentsCount": {
+            "type": "integer",
+            "example": 1
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          }
+        },
+        "required": [
+          "post",
+          "commentsCount",
+          "comments"
+        ]
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "nerdy_nora",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "nora@example.com",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "S3cretPass!",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "password"
+        ]
+      },
+      "LoginRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "nora@example.com",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "S3cretPass!",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "RegisterResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User registered successfully"
+          },
+          "token": {
+            "type": "string",
+            "description": "JWT access token (5 minutes).",
+            "example": "eyJhbGciOi..."
+          }
+        },
+        "required": [
+          "message",
+          "token"
+        ]
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User logged in successfully"
+          },
+          "accessToken": {
+            "type": "string",
+            "description": "JWT access token (5 minutes).",
+            "example": "eyJhbGciOi..."
+          }
+        },
+        "required": [
+          "message",
+          "accessToken"
+        ]
+      },
+      "RefreshResponse": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "New JWT access token (5 minutes).",
+            "example": "eyJhbGciOi..."
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "GameInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Hades",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "example": "Roguelike dungeon crawler",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ]
+      },
+      "PostCreateInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Best build for beginners?",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "example": "Which skills should I level first?",
+            "minLength": 1
+          },
+          "gameId": {
+            "type": "integer",
+            "example": 1,
+            "description": "Id of the game the post belongs to."
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "gameId"
+        ]
+      },
+      "PostUpdateInput": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "example": "Best build for beginners? (solved)",
+            "minLength": 1
+          },
+          "description": {
+            "type": "string",
+            "example": "Thanks!",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "title",
+          "description"
+        ]
+      },
+      "CommentCreateInput": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "example": "Go with the Igni build.",
+            "minLength": 1
+          },
+          "postId": {
+            "type": "integer",
+            "example": 7,
+            "description": "Id of the post being commented on."
+          }
+        },
+        "required": [
+          "content",
+          "postId"
+        ]
+      },
+      "CommentUpdateInput": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "example": "Go with the Igni build - very forgiving.",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "content"
+        ]
+      },
+      "UserCreateInput": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "nerdy_nora",
+            "minLength": 1
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "nora@example.com",
+            "minLength": 1
+          },
+          "\"password\"": {
+            "type": "string",
+            "example": "S3cretPass!",
+            "minLength": 1,
+            "description": "Property name includes the literal quote characters."
+          }
+        },
+        "required": [
+          "username",
+          "email",
+          "\"password\""
+        ]
+      },
+      "UserUpdateInput": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "nora_the_nerd",
+            "minLength": 1
+          },
+          "\"password\"": {
+            "type": "string",
+            "example": "NewS3cret!",
+            "minLength": 1,
+            "description": "Property name includes the literal quote characters."
+          }
+        },
+        "required": [
+          "username",
+          "\"password\""
+        ]
+      }
+    },
+    "responses": {
+      "Unauthenticated": {
+        "description": "No `access_token` cookie was sent - the user is not logged in.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "unauthenticated": {
+                "summary": "Unauthenticated",
+                "value": {
+                  "message": "Unauthenticated"
+                }
+              }
+            }
+          }
+        }
+      },
+      "ForbiddenToken": {
+        "description": "The `access_token` cookie is invalid/expired, or its user no longer exists.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "invalid_token": {
+                "summary": "Invalid token",
+                "value": {
+                  "message": "Forbidden: Invalid token"
+                }
+              }
+            }
+          }
+        }
+      },
+      "BadRequest": {
+        "description": "The request could not be processed (e.g. a database error).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "examples": {
+              "bad_request": {
+                "summary": "Bad request",
+                "value": {
+                  "message": "Bad request"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
