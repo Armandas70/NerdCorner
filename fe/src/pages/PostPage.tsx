@@ -71,7 +71,7 @@ function PostPage() {
     }, []);
 
     return (
-        <div className="pb-14">
+        <div className="min-h-screen flex flex-col">
             <div className='mb-5'>
                 <Header></Header>
                 {game && (
